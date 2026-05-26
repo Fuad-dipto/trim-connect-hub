@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HomeRouteImport } from './routes/home'
@@ -20,6 +21,11 @@ import { Route as SalonsIdRouteImport } from './routes/salons.$id'
 import { Route as ChatBarberIdRouteImport } from './routes/chat.$barberId'
 import { Route as BookBarberIdRouteImport } from './routes/book.$barberId'
 
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PaymentRoute = PaymentRouteImport.update({
   id: '/payment',
   path: '/payment',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/payment': typeof PaymentRoute
+  '/profile': typeof ProfileRoute
   '/book/$barberId': typeof BookBarberIdRoute
   '/chat/$barberId': typeof ChatBarberIdRoute
   '/salons/$id': typeof SalonsIdRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/payment': typeof PaymentRoute
+  '/profile': typeof ProfileRoute
   '/book/$barberId': typeof BookBarberIdRoute
   '/chat/$barberId': typeof ChatBarberIdRoute
   '/salons/$id': typeof SalonsIdRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/payment': typeof PaymentRoute
+  '/profile': typeof ProfileRoute
   '/book/$barberId': typeof BookBarberIdRoute
   '/chat/$barberId': typeof ChatBarberIdRoute
   '/salons/$id': typeof SalonsIdRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/login'
     | '/payment'
+    | '/profile'
     | '/book/$barberId'
     | '/chat/$barberId'
     | '/salons/$id'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/login'
     | '/payment'
+    | '/profile'
     | '/book/$barberId'
     | '/chat/$barberId'
     | '/salons/$id'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/login'
     | '/payment'
+    | '/profile'
     | '/book/$barberId'
     | '/chat/$barberId'
     | '/salons/$id'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
   PaymentRoute: typeof PaymentRoute
+  ProfileRoute: typeof ProfileRoute
   BookBarberIdRoute: typeof BookBarberIdRoute
   ChatBarberIdRoute: typeof ChatBarberIdRoute
   SalonsIdRoute: typeof SalonsIdRoute
@@ -162,6 +175,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/payment': {
       id: '/payment'
       path: '/payment'
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
   PaymentRoute: PaymentRoute,
+  ProfileRoute: ProfileRoute,
   BookBarberIdRoute: BookBarberIdRoute,
   ChatBarberIdRoute: ChatBarberIdRoute,
   SalonsIdRoute: SalonsIdRoute,
