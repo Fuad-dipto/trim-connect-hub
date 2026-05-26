@@ -20,6 +20,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as SalonsIdRouteImport } from './routes/salons.$id'
 import { Route as OwnerServicesRouteImport } from './routes/owner.services'
+import { Route as OwnerBookingsRouteImport } from './routes/owner.bookings'
 import { Route as OwnerBarbersRouteImport } from './routes/owner.barbers'
 import { Route as ChatBarberIdRouteImport } from './routes/chat.$barberId'
 import { Route as BookBarberIdRouteImport } from './routes/book.$barberId'
@@ -79,6 +80,11 @@ const OwnerServicesRoute = OwnerServicesRouteImport.update({
   path: '/owner/services',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OwnerBookingsRoute = OwnerBookingsRouteImport.update({
+  id: '/owner/bookings',
+  path: '/owner/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OwnerBarbersRoute = OwnerBarbersRouteImport.update({
   id: '/owner/barbers',
   path: '/owner/barbers',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/book/$barberId': typeof BookBarberIdRoute
   '/chat/$barberId': typeof ChatBarberIdRoute
   '/owner/barbers': typeof OwnerBarbersRoute
+  '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/salons/$id': typeof SalonsIdRoute
   '/owner/': typeof OwnerIndexRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/book/$barberId': typeof BookBarberIdRoute
   '/chat/$barberId': typeof ChatBarberIdRoute
   '/owner/barbers': typeof OwnerBarbersRoute
+  '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/salons/$id': typeof SalonsIdRoute
   '/owner': typeof OwnerIndexRoute
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/book/$barberId': typeof BookBarberIdRoute
   '/chat/$barberId': typeof ChatBarberIdRoute
   '/owner/barbers': typeof OwnerBarbersRoute
+  '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/salons/$id': typeof SalonsIdRoute
   '/owner/': typeof OwnerIndexRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/book/$barberId'
     | '/chat/$barberId'
     | '/owner/barbers'
+    | '/owner/bookings'
     | '/owner/services'
     | '/salons/$id'
     | '/owner/'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/book/$barberId'
     | '/chat/$barberId'
     | '/owner/barbers'
+    | '/owner/bookings'
     | '/owner/services'
     | '/salons/$id'
     | '/owner'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/book/$barberId'
     | '/chat/$barberId'
     | '/owner/barbers'
+    | '/owner/bookings'
     | '/owner/services'
     | '/salons/$id'
     | '/owner/'
@@ -207,6 +219,7 @@ export interface RootRouteChildren {
   BookBarberIdRoute: typeof BookBarberIdRoute
   ChatBarberIdRoute: typeof ChatBarberIdRoute
   OwnerBarbersRoute: typeof OwnerBarbersRoute
+  OwnerBookingsRoute: typeof OwnerBookingsRoute
   OwnerServicesRoute: typeof OwnerServicesRoute
   SalonsIdRoute: typeof SalonsIdRoute
   OwnerIndexRoute: typeof OwnerIndexRoute
@@ -291,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/owner/bookings': {
+      id: '/owner/bookings'
+      path: '/owner/bookings'
+      fullPath: '/owner/bookings'
+      preLoaderRoute: typeof OwnerBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/owner/barbers': {
       id: '/owner/barbers'
       path: '/owner/barbers'
@@ -327,6 +347,7 @@ const rootRouteChildren: RootRouteChildren = {
   BookBarberIdRoute: BookBarberIdRoute,
   ChatBarberIdRoute: ChatBarberIdRoute,
   OwnerBarbersRoute: OwnerBarbersRoute,
+  OwnerBookingsRoute: OwnerBookingsRoute,
   OwnerServicesRoute: OwnerServicesRoute,
   SalonsIdRoute: SalonsIdRoute,
   OwnerIndexRoute: OwnerIndexRoute,
