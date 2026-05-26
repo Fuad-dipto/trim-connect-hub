@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-ro
 import { MapPin, Star, Clock, Phone, MessageCircle, Users, ChevronRight } from "lucide-react";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { GradientBlob, Avatar } from "@/components/brand";
-import { getSalon, type Barber } from "@/lib/mock-data";
+import { getSalon, type Barber, type Salon } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/salons/$id")({
 });
 
 function SalonDetails() {
-  const { salon } = Route.useLoaderData();
+  const { salon } = Route.useLoaderData() as { salon: Salon };
   const nav = useNavigate();
 
   return (
