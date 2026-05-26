@@ -17,6 +17,7 @@ import { Route as ChatsRouteImport } from './routes/chats'
 import { Route as BookingsRouteImport } from './routes/bookings'
 import { Route as BookingSuccessRouteImport } from './routes/booking-success'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as SalonsIdRouteImport } from './routes/salons.$id'
 import { Route as ChatBarberIdRouteImport } from './routes/chat.$barberId'
 import { Route as BookBarberIdRouteImport } from './routes/book.$barberId'
@@ -61,6 +62,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OwnerIndexRoute = OwnerIndexRouteImport.update({
+  id: '/owner/',
+  path: '/owner/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SalonsIdRoute = SalonsIdRouteImport.update({
   id: '/salons/$id',
   path: '/salons/$id',
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/book/$barberId': typeof BookBarberIdRoute
   '/chat/$barberId': typeof ChatBarberIdRoute
   '/salons/$id': typeof SalonsIdRoute
+  '/owner/': typeof OwnerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/book/$barberId': typeof BookBarberIdRoute
   '/chat/$barberId': typeof ChatBarberIdRoute
   '/salons/$id': typeof SalonsIdRoute
+  '/owner': typeof OwnerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/book/$barberId': typeof BookBarberIdRoute
   '/chat/$barberId': typeof ChatBarberIdRoute
   '/salons/$id': typeof SalonsIdRoute
+  '/owner/': typeof OwnerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/book/$barberId'
     | '/chat/$barberId'
     | '/salons/$id'
+    | '/owner/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/book/$barberId'
     | '/chat/$barberId'
     | '/salons/$id'
+    | '/owner'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/book/$barberId'
     | '/chat/$barberId'
     | '/salons/$id'
+    | '/owner/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,6 +183,7 @@ export interface RootRouteChildren {
   BookBarberIdRoute: typeof BookBarberIdRoute
   ChatBarberIdRoute: typeof ChatBarberIdRoute
   SalonsIdRoute: typeof SalonsIdRoute
+  OwnerIndexRoute: typeof OwnerIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -231,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/owner/': {
+      id: '/owner/'
+      path: '/owner'
+      fullPath: '/owner/'
+      preLoaderRoute: typeof OwnerIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/salons/$id': {
       id: '/salons/$id'
       path: '/salons/$id'
@@ -267,7 +287,18 @@ const rootRouteChildren: RootRouteChildren = {
   BookBarberIdRoute: BookBarberIdRoute,
   ChatBarberIdRoute: ChatBarberIdRoute,
   SalonsIdRoute: SalonsIdRoute,
+  OwnerIndexRoute: OwnerIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
