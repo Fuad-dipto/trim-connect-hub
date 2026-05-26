@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SalonsIdRouteImport } from './routes/salons.$id'
+import { Route as ChatBarberIdRouteImport } from './routes/chat.$barberId'
 
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
@@ -28,34 +29,43 @@ const SalonsIdRoute = SalonsIdRouteImport.update({
   path: '/salons/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChatBarberIdRoute = ChatBarberIdRouteImport.update({
+  id: '/chat/$barberId',
+  path: '/chat/$barberId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
+  '/chat/$barberId': typeof ChatBarberIdRoute
   '/salons/$id': typeof SalonsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
+  '/chat/$barberId': typeof ChatBarberIdRoute
   '/salons/$id': typeof SalonsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
+  '/chat/$barberId': typeof ChatBarberIdRoute
   '/salons/$id': typeof SalonsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/home' | '/salons/$id'
+  fullPaths: '/' | '/home' | '/chat/$barberId' | '/salons/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/salons/$id'
-  id: '__root__' | '/' | '/home' | '/salons/$id'
+  to: '/' | '/home' | '/chat/$barberId' | '/salons/$id'
+  id: '__root__' | '/' | '/home' | '/chat/$barberId' | '/salons/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HomeRoute: typeof HomeRoute
+  ChatBarberIdRoute: typeof ChatBarberIdRoute
   SalonsIdRoute: typeof SalonsIdRoute
 }
 
@@ -82,14 +92,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SalonsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/chat/$barberId': {
+      id: '/chat/$barberId'
+      path: '/chat/$barberId'
+      fullPath: '/chat/$barberId'
+      preLoaderRoute: typeof ChatBarberIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HomeRoute: HomeRoute,
+  ChatBarberIdRoute: ChatBarberIdRoute,
   SalonsIdRoute: SalonsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
