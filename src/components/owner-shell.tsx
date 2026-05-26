@@ -3,13 +3,14 @@ import { LayoutDashboard, Users, Scissors, CalendarDays, Settings, Bell } from "
 import { Brand, Avatar } from "@/components/brand";
 import { cn } from "@/lib/utils";
 
-const nav = [
+type NavItem = { to: string; icon: typeof LayoutDashboard; label: string; exact?: boolean };
+const nav: NavItem[] = [
   { to: "/owner", icon: LayoutDashboard, label: "Dashboard", exact: true },
   { to: "/owner/barbers", icon: Users, label: "Barbers" },
   { to: "/owner/services", icon: Scissors, label: "Services" },
   { to: "/owner/bookings", icon: CalendarDays, label: "Bookings" },
   { to: "/owner/settings", icon: Settings, label: "Salon profile" },
-] as const;
+];
 
 export function OwnerShell({ title, subtitle, action, children }: {
   title: string; subtitle?: string; action?: React.ReactNode; children: React.ReactNode;
@@ -28,7 +29,7 @@ export function OwnerShell({ title, subtitle, action, children }: {
             {nav.map((n) => {
               const active = n.exact ? location.pathname === n.to : location.pathname.startsWith(n.to);
               return (
-                <Link key={n.to} to={n.to} className={cn(
+                <Link key={n.to} to={n.to as any} className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition",
                   active ? "bg-primary text-primary-foreground font-semibold shadow-sm" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                 )}>
@@ -73,7 +74,7 @@ export function OwnerShell({ title, subtitle, action, children }: {
               {nav.map((n) => {
                 const active = n.exact ? location.pathname === n.to : location.pathname.startsWith(n.to);
                 return (
-                  <Link key={n.to} to={n.to} className={cn(
+                  <Link key={n.to} to={n.to as any} className={cn(
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap",
                     active ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground"
                   )}>
