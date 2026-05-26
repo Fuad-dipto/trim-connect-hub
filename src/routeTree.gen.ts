@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as ChatsRouteImport } from './routes/chats'
 import { Route as BookingsRouteImport } from './routes/bookings'
 import { Route as BookingSuccessRouteImport } from './routes/booking-success'
 import { Route as IndexRouteImport } from './routes/index'
@@ -32,6 +33,11 @@ const LoginRoute = LoginRouteImport.update({
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatsRoute = ChatsRouteImport.update({
+  id: '/chats',
+  path: '/chats',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookingsRoute = BookingsRouteImport.update({
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/booking-success': typeof BookingSuccessRoute
   '/bookings': typeof BookingsRoute
+  '/chats': typeof ChatsRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/payment': typeof PaymentRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/booking-success': typeof BookingSuccessRoute
   '/bookings': typeof BookingsRoute
+  '/chats': typeof ChatsRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/payment': typeof PaymentRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/booking-success': typeof BookingSuccessRoute
   '/bookings': typeof BookingsRoute
+  '/chats': typeof ChatsRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/payment': typeof PaymentRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/booking-success'
     | '/bookings'
+    | '/chats'
     | '/home'
     | '/login'
     | '/payment'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/'
     | '/booking-success'
     | '/bookings'
+    | '/chats'
     | '/home'
     | '/login'
     | '/payment'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/booking-success'
     | '/bookings'
+    | '/chats'
     | '/home'
     | '/login'
     | '/payment'
@@ -139,6 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BookingSuccessRoute: typeof BookingSuccessRoute
   BookingsRoute: typeof BookingsRoute
+  ChatsRoute: typeof ChatsRoute
   HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
   PaymentRoute: typeof PaymentRoute
@@ -168,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chats': {
+      id: '/chats'
+      path: '/chats'
+      fullPath: '/chats'
+      preLoaderRoute: typeof ChatsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bookings': {
@@ -219,6 +239,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BookingSuccessRoute: BookingSuccessRoute,
   BookingsRoute: BookingsRoute,
+  ChatsRoute: ChatsRoute,
   HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
   PaymentRoute: PaymentRoute,
