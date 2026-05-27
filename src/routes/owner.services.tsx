@@ -191,47 +191,16 @@ function ServiceForm({ open, onClose, service }: { open: boolean; onClose: () =>
     if (!form.name.trim()) { toast.error("Name is required"); return; }
     if (form.price <= 0) { toast.error("Set a valid price"); return; }
 
-    let serviceId = service?.id;
-    if (isEdit && service) {
-      ownerActions.updateService(service.id, form);
-    } else {
-      // generate id and add via store (we let store assign id but we need it for assignments)
-      const newId = Math.random().toString(36).slice(2, 9);
-      // mimic addService but with known id
-      ownerActions.addService(form);
-      // newest service is first; capture its id
-      // (assignments rely on the new id which we don't have; re-read via store snapshot)
-      serviceId = newId; // placeholder; we will re-resolve below
-    }
+    const targetId = isEdit && service
+      ? (ownerActions.updateService(service.id, form), service.id)
+      : ownerActions.addService(form);
 
-    // re-resolve serviceId from updated store snapshot if new
-    if (!isEdit) {
-      const snap = (useOwnerStore as any); // not used directly
-      void snap;
-      // pick most recent service by name match
-      // simpler: re-read snapshot
-    }
-
-    // apply assignments
-    // re-read current services snapshot via window of state — simplest: defer to assigning after add
-    setTimeout(() => {
-      // resolve serviceId for new services by matching name (latest first)
-      let resolvedId = service?.id;
-      if (!isEdit) {
-        // read from latest snapshot using a hidden hook? we can do it imperatively via the actions API is not exposed.
-        // Fallback: pull from window store? We'll just leave assignments to be handled via a follow-up patch using the store directly.
-      }
-      const targetId = resolvedId;
-      if (targetId) {
-        // update each employee's serviceIds
-        employees.forEach((e) => {
-          const shouldHave = assigned.includes(e.id);
-          const has = e.serviceIds.includes(targetId);
-          if (shouldHave && !has) ownerActions.updateEmployee(e.id, { serviceIds: [...e.serviceIds, targetId] });
-          if (!shouldHave && has) ownerActions.updateEmployee(e.id, { serviceIds: e.serviceIds.filter((x) => x !== targetId) });
-        });
-      }
-    }, 0);
+    employees.forEach((e) => {
+      const shouldHave = assigned.includes(e.id);
+      const has = e.serviceIds.includes(targetId);
+      if (shouldHave && !has) ownerActions.updateEmployee(e.id, { serviceIds: [...e.serviceIds, targetId] });
+      if (!shouldHave && has) ownerActions.updateEmployee(e.id, { serviceIds: e.serviceIds.filter((x) => x !== targetId) });
+    });
 
     toast.success(isEdit ? "Service updated" : "Service added");
     onClose();
