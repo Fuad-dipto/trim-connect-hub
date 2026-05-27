@@ -30,14 +30,24 @@ export function GradientBlob({ hue, className }: { hue: number; className?: stri
   );
 }
 
-export function Avatar({ hue, name, size = 40 }: { hue: number; name: string; size?: number }) {
+export function Avatar({ hue, name, size = 40, src }: { hue: number; name: string; size?: number; src?: string }) {
   const initials = name.split(" ").map((n) => n[0]).slice(0, 2).join("");
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={name}
+        className="rounded-full object-cover shadow-sm ring-1 ring-border"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
   return (
     <div
       className="rounded-full flex items-center justify-center text-white font-semibold shadow-sm"
       style={{
         width: size, height: size,
-        background: `linear-gradient(135deg, oklch(0.7 0.18 ${hue}), oklch(0.45 0.22 ${(hue + 60) % 360}))`,
+        background: `linear-gradient(135deg, oklch(0.7 0.14 ${hue}), oklch(0.35 0.05 ${(hue + 40) % 360}))`,
         fontSize: size * 0.36,
       }}
     >
