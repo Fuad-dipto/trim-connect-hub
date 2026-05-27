@@ -89,7 +89,11 @@ function Dashboard() {
             <span className="text-xs text-muted-foreground group-hover:text-foreground">Manage →</span>
           </div>
           <p className="text-2xl font-bold mt-3">{services.length} services</p>
-          <p className="text-xs text-muted-foreground">From {Math.min(...services.map(s => s.price))}৳ to {Math.max(...services.map(s => s.price))}৳</p>
+          <p className="text-xs text-muted-foreground">
+            {services.length > 0
+              ? `From ${Math.min(...services.map(s => s.price))}৳ to ${Math.max(...services.map(s => s.price))}৳`
+              : "Add services to start earning"}
+          </p>
         </Link>
       </div>
 
