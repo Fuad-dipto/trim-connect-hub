@@ -92,10 +92,11 @@ export const ownerActions = {
     state = { ...state, profile: { ...state.profile, ...patch, socials: { ...state.profile.socials, ...(patch.socials || {}) } } };
     emit();
   },
-  addEmployee(e: Omit<Employee, "id" | "rating" | "hue"> & Partial<Pick<Employee, "rating" | "hue">>) {
+  addEmployee(e: Omit<Employee, "id" | "rating" | "hue"> & Partial<Pick<Employee, "rating" | "hue">>): string {
     const emp: Employee = { id: uid(), rating: 5.0, hue: Math.floor(Math.random() * 360), ...e };
     state = { ...state, employees: [emp, ...state.employees] };
     emit();
+    return emp.id;
   },
   updateEmployee(id: string, patch: Partial<Employee>) {
     state = { ...state, employees: state.employees.map((e) => (e.id === id ? { ...e, ...patch } : e)) };
@@ -105,9 +106,11 @@ export const ownerActions = {
     state = { ...state, employees: state.employees.filter((e) => e.id !== id) };
     emit();
   },
-  addService(s: Omit<OwnerService, "id">) {
-    state = { ...state, services: [{ id: uid(), ...s }, ...state.services] };
+  addService(s: Omit<OwnerService, "id">): string {
+    const id = uid();
+    state = { ...state, services: [{ id, ...s }, ...state.services] };
     emit();
+    return id;
   },
   updateService(id: string, patch: Partial<OwnerService>) {
     state = { ...state, services: state.services.map((s) => (s.id === id ? { ...s, ...patch } : s)) };
