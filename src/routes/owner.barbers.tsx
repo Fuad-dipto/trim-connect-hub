@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Plus, Star, Search, Phone, MapPin, Pencil, Trash2,
@@ -283,7 +283,7 @@ function EmployeeForm({
 
   // sync when opening different employee
   const key = employee?.id ?? (open ? "new" : "closed");
-  useMemo(() => {
+  useEffect(() => {
     setForm({
       name: employee?.name ?? "",
       phone: employee?.phone ?? "",
