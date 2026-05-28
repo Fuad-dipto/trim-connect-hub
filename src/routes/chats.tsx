@@ -29,7 +29,7 @@ function Chats() {
         {conversations.map((c) => (
           <li key={c.barber.id}>
             <Link to="/chat/$barberId" params={{ barberId: c.barber.id }} className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/40">
-              <Avatar hue={c.barber.avatarHue} name={c.barber.name} size={48}/>
+              <Avatar hue={c.barber.avatarHue} name={c.barber.name} size={48} src={c.barber.photo}/>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between gap-2">
                   <p className="font-semibold text-sm truncate">{c.barber.name}</p>
