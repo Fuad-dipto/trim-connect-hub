@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, notFound, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { CheckCircle2, Clock } from "lucide-react";
+import { CheckCircle2, Clock, Plus } from "lucide-react";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
 import { getBarber, timeSlots, type Barber, type Salon } from "@/lib/mock-data";
@@ -21,20 +21,26 @@ function Book() {
   const { barber, salon } = data;
   const nav = useNavigate();
 
-  const [serviceId, setServiceId] = useState(barber.services[0].id);
+  const [selected, setSelected] = useState<string[]>([barber.services[0].id]);
   const [slot, setSlot] = useState(timeSlots[3]);
-  const service = barber.services.find((s) => s.id === serviceId)!;
 
+  const toggle = (id: string) =>
+    setSelected((prev) => prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]);
+
+  const services = barber.services.filter((s) => selected.includes(s.id));
+  const subtotal = services.reduce((sum, s) => sum + s.price, 0);
+  const duration = services.reduce((sum, s) => sum + s.duration, 0);
   const fee = 20;
-  const total = service.price + fee;
+  const tax = Math.round(subtotal * 0.05);
+  const total = subtotal + fee + tax;
 
   return (
     <MobileShell>
       <PageHeader title="Book appointment" subtitle={salon.name} back={() => nav({ to: "/salons/$id", params: { id: salon.id } })} />
 
-      <div className="px-4 py-4 space-y-5">
+      <div className="px-4 py-4 pb-40 space-y-5">
         <div className="rounded-2xl bg-card border border-border p-3 flex items-center gap-3">
-          <Avatar hue={barber.avatarHue} name={barber.name} size={48} />
+          <Avatar hue={barber.avatarHue} name={barber.name} size={48} src={barber.photo} />
           <div className="flex-1">
             <p className="font-semibold">{barber.name}</p>
             <p className="text-xs text-muted-foreground">{barber.designation} · {barber.experience}</p>
@@ -43,24 +49,33 @@ function Book() {
         </div>
 
         <section>
-          <h2 className="font-semibold text-sm mb-2">Choose service</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-semibold text-sm">Choose services <span className="text-muted-foreground font-normal">· tap to add multiple</span></h2>
+            <span className="text-[11px] text-muted-foreground">{selected.length} selected</span>
+          </div>
           <div className="space-y-2">
-            {barber.services.map((s) => (
-              <button key={s.id} onClick={() => setServiceId(s.id)}
-                className={cn(
-                  "w-full text-left rounded-xl border p-3 flex items-center justify-between transition",
-                  serviceId === s.id ? "border-primary bg-primary/5 ring-2 ring-primary/20" : "border-border bg-card"
-                )}>
-                <div>
-                  <p className="text-sm font-medium flex items-center gap-2">
-                    {s.name}
-                    {serviceId === s.id && <CheckCircle2 className="h-4 w-4 text-primary"/>}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{s.description} · <Clock className="h-3 w-3 inline"/> {s.duration} min</p>
-                </div>
-                <p className="font-semibold">{s.price}৳</p>
-              </button>
-            ))}
+            {barber.services.map((s) => {
+              const on = selected.includes(s.id);
+              return (
+                <button key={s.id} onClick={() => toggle(s.id)}
+                  className={cn(
+                    "w-full text-left rounded-xl border p-3 flex items-center gap-3 transition",
+                    on ? "border-primary bg-primary/5 ring-2 ring-primary/20" : "border-border bg-card"
+                  )}>
+                  <div className={cn(
+                    "h-6 w-6 rounded-md border-2 flex items-center justify-center shrink-0",
+                    on ? "bg-primary border-primary text-primary-foreground" : "border-border"
+                  )}>
+                    {on ? <CheckCircle2 className="h-4 w-4"/> : <Plus className="h-3.5 w-3.5 text-muted-foreground"/>}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">{s.name}</p>
+                    <p className="text-xs text-muted-foreground">{s.description} · <Clock className="h-3 w-3 inline"/> {s.duration} min</p>
+                  </div>
+                  <p className="font-semibold">{s.price}৳</p>
+                </button>
+              );
+            })}
           </div>
         </section>
 
@@ -81,21 +96,23 @@ function Book() {
               );
             })}
           </div>
-          <p className="text-[11px] text-muted-foreground mt-2">Live queue: 2 people ahead · ~18 min wait if you walk in</p>
+          <p className="text-[11px] text-muted-foreground mt-2">Total duration: ~{duration} min · Live queue: 2 ahead</p>
         </section>
 
-        <section className="rounded-2xl bg-card border border-border p-4 space_y-2">
+        <section className="rounded-2xl bg-card border border-border p-4 space-y-2">
           <h2 className="font-semibold text-sm mb-2">Price summary</h2>
-          <Row label={service.name} value={`${service.price}৳`} />
+          {services.map((s) => <Row key={s.id} label={s.name} value={`${s.price}৳`} />)}
+          {services.length === 0 && <p className="text-xs text-muted-foreground">Select at least one service.</p>}
           <Row label="Booking fee" value={`${fee}৳`} />
+          <Row label="VAT (5%)" value={`${tax}৳`} />
           <div className="border-t border-border my-2"/>
           <Row label="Total" value={`${total}৳`} bold />
         </section>
       </div>
 
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-md bg-background/95 backdrop-blur border-t border-border px-4 py-3">
-        <Link to="/login" search={{ next: `/payment?service=${service.id}&barber=${barber.id}&slot=${encodeURIComponent(slot)}` }}>
-          <Button className="w-full h-12 rounded-xl font-semibold">
+      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-md bg-background/95 backdrop-blur border-t border-border px-4 py-3 z-30">
+        <Link to="/login" search={{ next: `/payment?services=${selected.join(",")}&barber=${barber.id}&slot=${encodeURIComponent(slot)}` }}>
+          <Button disabled={services.length === 0} className="liquid-glass w-full h-12 rounded-xl font-semibold disabled:opacity-50">
             Continue · {total}৳
           </Button>
         </Link>
