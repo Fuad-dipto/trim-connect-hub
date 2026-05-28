@@ -8,6 +8,7 @@ export type Barber = {
   rating: number;
   avatarHue: number;
   services: Service[];
+  photo?: string;
 };
 
 export type Service = {
@@ -35,6 +36,23 @@ export type Salon = {
   hue: number;
   barbers: Barber[];
   gallery: number[]; // hues for gradient placeholders
+  photos?: string[];
+  cover?: string;
+  lat: number;
+  lng: number;
+  address: string;
+  phone: string;
+  weeklyHours: { day: string; open: string; closed?: boolean }[];
+  reviews: Review[];
+};
+
+export type Review = {
+  id: string;
+  name: string;
+  avatar?: string;
+  rating: number;
+  date: string;
+  text: string;
 };
 
 const svc = (id: string, name: string, description: string, duration: number, price: number): Service => ({
@@ -53,8 +71,45 @@ const baseServices: Service[] = [
 const mkBarber = (
   id: string, name: string, designation: string, experience: string,
   skills: string[], status: Barber["status"], rating: number, hue: number,
-  services: Service[]
-): Barber => ({ id, name, designation, experience, skills, status, rating, avatarHue: hue, services });
+  services: Service[], photo?: string,
+): Barber => ({ id, name, designation, experience, skills, status, rating, avatarHue: hue, services, photo });
+
+// Unsplash dummy assets
+const U = (id: string, w = 400) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
+
+const barberPhotos = [
+  U("photo-1599351431202-1e0f0137899a"), // barber 1
+  U("photo-1622286342621-4bd786c2447c"), // barber 2
+  U("photo-1605497788044-5a32c7078486"), // barber 3
+  U("photo-1583195764036-6dc248ac07d9"), // barber 4
+  U("photo-1500648767791-00dcc994a43e"), // m1
+  U("photo-1508214751196-bcfd4ca60f91"), // m2
+  U("photo-1519085360753-af0119f7cbe7"), // m3
+  U("photo-1492562080023-ab3db95bfbce"), // m4
+  U("photo-1607990281513-2c110a25bd8c"), // f1
+  U("photo-1580489944761-15a19d654956"), // f2
+];
+
+const salonPhotos1 = [U("photo-1521590832167-7bcbfaa6381f", 800), U("photo-1503951914875-452162b0f3f1", 800), U("photo-1622286342621-4bd786c2447c", 800), U("photo-1585747860715-2ba37e788b70", 800)];
+const salonPhotos2 = [U("photo-1503951914875-452162b0f3f1", 800), U("photo-1599351431202-1e0f0137899a", 800), U("photo-1493256338651-d82f7acb2b38", 800), U("photo-1535930891776-0c2dfb7fda1a", 800)];
+const salonPhotos3 = [U("photo-1532710093739-9470acff878f", 800), U("photo-1521490214180-77af1057d738", 800), U("photo-1622287162716-f311baa1a2b8", 800), U("photo-1622286346003-c5c7e63b1088", 800)];
+
+const defaultHours = [
+  { day: "Mon", open: "10:00 AM — 10:00 PM" },
+  { day: "Tue", open: "10:00 AM — 10:00 PM" },
+  { day: "Wed", open: "10:00 AM — 10:00 PM" },
+  { day: "Thu", open: "10:00 AM — 10:00 PM" },
+  { day: "Fri", open: "10:00 AM — 11:00 PM" },
+  { day: "Sat", open: "9:00 AM — 11:00 PM" },
+  { day: "Sun", open: "Closed", closed: true },
+];
+
+const sampleReviews = (seed: number): Review[] => [
+  { id: `r${seed}1`, name: "Anika Rahman", avatar: U("photo-1494790108377-be9c29b29330"), rating: 5, date: "2 days ago", text: "Absolutely loved the experience. Rohim gave me the cleanest fade I've had in years. Highly recommend!" },
+  { id: `r${seed}2`, name: "Mahin Khan", avatar: U("photo-1535713875002-d1d0cf377fde"), rating: 5, date: "1 week ago", text: "Premium vibe, super hygienic and the chai while waiting was a nice touch. Booking via the app was effortless." },
+  { id: `r${seed}3`, name: "Sumaiya Islam", avatar: U("photo-1438761681033-6461ffad8d80"), rating: 4, date: "2 weeks ago", text: "Color came out beautiful. Took slightly longer than promised but worth it." },
+  { id: `r${seed}4`, name: "Rafsan Ahmed", avatar: U("photo-1500648767791-00dcc994a43e"), rating: 5, date: "3 weeks ago", text: "Best barbershop in Dhaka, hands down. Already booked my next slot." },
+];
 
 export const salons: Salon[] = [
   {
@@ -73,11 +128,18 @@ export const salons: Salon[] = [
     hours: "10:00 AM — 10:00 PM",
     hue: 285,
     gallery: [285, 260, 310, 200],
+    photos: salonPhotos1,
+    cover: salonPhotos1[0],
+    lat: 23.7925, lng: 90.4078,
+    address: "House 42, Road 11, Gulshan 2, Dhaka",
+    phone: "+880 1700-111222",
+    weeklyHours: defaultHours,
+    reviews: sampleReviews(1),
     barbers: [
-      mkBarber("b1", "Rohim Ahmed", "Senior Stylist", "8 yrs", ["Fade", "Color", "Beard"], "free", 4.9, 285, baseServices),
-      mkBarber("b2", "Karim Hossain", "Master Barber", "12 yrs", ["Classic", "Shave"], "busy", 4.8, 200, baseServices),
-      mkBarber("b3", "Sharif Islam", "Stylist", "4 yrs", ["Modern", "Kids"], "free", 4.7, 320, baseServices),
-      mkBarber("b4", "Niloy Khan", "Color Specialist", "6 yrs", ["Color", "Highlights"], "free", 4.9, 30, baseServices),
+      mkBarber("b1", "Rohim Ahmed", "Senior Stylist", "8 yrs", ["Fade", "Color", "Beard"], "free", 4.9, 285, baseServices, barberPhotos[0]),
+      mkBarber("b2", "Karim Hossain", "Master Barber", "12 yrs", ["Classic", "Shave"], "busy", 4.8, 200, baseServices, barberPhotos[1]),
+      mkBarber("b3", "Sharif Islam", "Stylist", "4 yrs", ["Modern", "Kids"], "free", 4.7, 320, baseServices, barberPhotos[2]),
+      mkBarber("b4", "Niloy Khan", "Color Specialist", "6 yrs", ["Color", "Highlights"], "free", 4.9, 30, baseServices, barberPhotos[3]),
     ],
   },
   {
@@ -96,10 +158,17 @@ export const salons: Salon[] = [
     hours: "9:00 AM — 11:00 PM",
     hue: 200,
     gallery: [200, 220, 180, 240],
+    photos: salonPhotos2,
+    cover: salonPhotos2[0],
+    lat: 23.7937, lng: 90.4066,
+    address: "Block C, Road 11, Banani, Dhaka",
+    phone: "+880 1700-222333",
+    weeklyHours: defaultHours,
+    reviews: sampleReviews(2),
     barbers: [
-      mkBarber("b5", "Tareq Mahmud", "Senior Barber", "10 yrs", ["Fade", "Shave"], "busy", 4.8, 200, baseServices),
-      mkBarber("b6", "Joy Roy", "Barber", "3 yrs", ["Classic"], "free", 4.6, 230, baseServices),
-      mkBarber("b7", "Imran Sheikh", "Barber", "5 yrs", ["Modern"], "offline", 4.5, 180, baseServices),
+      mkBarber("b5", "Tareq Mahmud", "Senior Barber", "10 yrs", ["Fade", "Shave"], "busy", 4.8, 200, baseServices, barberPhotos[4]),
+      mkBarber("b6", "Joy Roy", "Barber", "3 yrs", ["Classic"], "free", 4.6, 230, baseServices, barberPhotos[5]),
+      mkBarber("b7", "Imran Sheikh", "Barber", "5 yrs", ["Modern"], "offline", 4.5, 180, baseServices, barberPhotos[6]),
     ],
   },
   {
@@ -118,10 +187,17 @@ export const salons: Salon[] = [
     hours: "8:00 AM — 9:00 PM",
     hue: 140,
     gallery: [140, 120, 160, 100],
+    photos: salonPhotos3,
+    cover: salonPhotos3[0],
+    lat: 23.7460, lng: 90.3742,
+    address: "Road 27, Dhanmondi, Dhaka",
+    phone: "+880 1700-333444",
+    weeklyHours: defaultHours,
+    reviews: sampleReviews(3),
     barbers: [
-      mkBarber("b8", "Sumon Ali", "Barber", "2 yrs", ["Classic"], "free", 4.3, 140, baseServices.slice(0, 3)),
-      mkBarber("b9", "Rafi Uddin", "Barber", "4 yrs", ["Quick"], "free", 4.5, 160, baseServices.slice(0, 3)),
-      mkBarber("b10", "Mizan Rahman", "Barber", "3 yrs", ["Kids"], "busy", 4.2, 120, baseServices.slice(0, 3)),
+      mkBarber("b8", "Sumon Ali", "Barber", "2 yrs", ["Classic"], "free", 4.3, 140, baseServices.slice(0, 3), barberPhotos[7]),
+      mkBarber("b9", "Rafi Uddin", "Barber", "4 yrs", ["Quick"], "free", 4.5, 160, baseServices.slice(0, 3), barberPhotos[0]),
+      mkBarber("b10", "Mizan Rahman", "Barber", "3 yrs", ["Kids"], "busy", 4.2, 120, baseServices.slice(0, 3), barberPhotos[1]),
     ],
   },
   {
@@ -140,10 +216,17 @@ export const salons: Salon[] = [
     hours: "11:00 AM — 9:00 PM",
     hue: 340,
     gallery: [340, 300, 20, 280],
+    photos: salonPhotos1,
+    cover: salonPhotos1[1],
+    lat: 23.8203, lng: 90.4250,
+    address: "Block J, Bashundhara R/A, Dhaka",
+    phone: "+880 1700-444555",
+    weeklyHours: defaultHours,
+    reviews: sampleReviews(4),
     barbers: [
-      mkBarber("b11", "Nadia Akter", "Lead Stylist", "9 yrs", ["Color", "Bridal"], "offline", 4.9, 340, baseServices),
-      mkBarber("b12", "Sabbir Hasan", "Senior Stylist", "7 yrs", ["Fade", "Beard"], "offline", 4.8, 300, baseServices),
-      mkBarber("b13", "Tasnim Jahan", "Color Expert", "5 yrs", ["Color"], "offline", 4.7, 20, baseServices),
+      mkBarber("b11", "Nadia Akter", "Lead Stylist", "9 yrs", ["Color", "Bridal"], "offline", 4.9, 340, baseServices, barberPhotos[8]),
+      mkBarber("b12", "Sabbir Hasan", "Senior Stylist", "7 yrs", ["Fade", "Beard"], "offline", 4.8, 300, baseServices, barberPhotos[2]),
+      mkBarber("b13", "Tasnim Jahan", "Color Expert", "5 yrs", ["Color"], "offline", 4.7, 20, baseServices, barberPhotos[9]),
     ],
   },
   {
@@ -162,10 +245,17 @@ export const salons: Salon[] = [
     hours: "10:00 AM — 10:30 PM",
     hue: 25,
     gallery: [25, 50, 10, 5],
+    photos: salonPhotos2,
+    cover: salonPhotos2[1],
+    lat: 23.8741, lng: 90.3984,
+    address: "Sector 4, Uttara, Dhaka",
+    phone: "+880 1700-555666",
+    weeklyHours: defaultHours,
+    reviews: sampleReviews(5),
     barbers: [
-      mkBarber("b14", "Hasib Karim", "Fade Artist", "6 yrs", ["Fade", "Design"], "free", 4.9, 25, baseServices),
-      mkBarber("b15", "Tanvir Alam", "Barber", "4 yrs", ["Classic"], "free", 4.6, 50, baseServices),
-      mkBarber("b16", "Riaz Mia", "Junior", "2 yrs", ["Beard"], "busy", 4.4, 10, baseServices),
+      mkBarber("b14", "Hasib Karim", "Fade Artist", "6 yrs", ["Fade", "Design"], "free", 4.9, 25, baseServices, barberPhotos[3]),
+      mkBarber("b15", "Tanvir Alam", "Barber", "4 yrs", ["Classic"], "free", 4.6, 50, baseServices, barberPhotos[4]),
+      mkBarber("b16", "Riaz Mia", "Junior", "2 yrs", ["Beard"], "busy", 4.4, 10, baseServices, barberPhotos[5]),
     ],
   },
   {
@@ -184,9 +274,16 @@ export const salons: Salon[] = [
     hours: "9:00 AM — 9:00 PM",
     hue: 350,
     gallery: [350, 330, 10, 290],
+    photos: salonPhotos3,
+    cover: salonPhotos3[1],
+    lat: 23.8061, lng: 90.3661,
+    address: "Mirpur DOHS, Avenue 5, Dhaka",
+    phone: "+880 1700-666777",
+    weeklyHours: defaultHours,
+    reviews: sampleReviews(6),
     barbers: [
-      mkBarber("b17", "Mim Chowdhury", "Stylist", "5 yrs", ["Bridal"], "free", 4.7, 350, baseServices),
-      mkBarber("b18", "Forhad Hossain", "Barber", "8 yrs", ["Classic", "Beard"], "free", 4.5, 330, baseServices),
+      mkBarber("b17", "Mim Chowdhury", "Stylist", "5 yrs", ["Bridal"], "free", 4.7, 350, baseServices, barberPhotos[8]),
+      mkBarber("b18", "Forhad Hossain", "Barber", "8 yrs", ["Classic", "Beard"], "free", 4.5, 330, baseServices, barberPhotos[6]),
     ],
   },
 ];

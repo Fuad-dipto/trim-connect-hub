@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
-import { MapPin, Star, Clock, Phone, MessageCircle, Users, ChevronRight } from "lucide-react";
+import { MapPin, Star, Clock, Phone, MessageCircle, Users, ChevronRight, Navigation } from "lucide-react";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
-import { GradientBlob, Avatar } from "@/components/brand";
+import { Avatar } from "@/components/brand";
 import { getSalon, type Barber, type Salon } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,19 +20,24 @@ function SalonDetails() {
   const { salon } = Route.useLoaderData() as { salon: Salon };
   const nav = useNavigate();
 
+  const today = new Date().toLocaleDateString("en-US", { weekday: "short" }).slice(0, 3);
+  const avgRating = salon.rating;
+  const bbox = `${salon.lng - 0.005},${salon.lat - 0.003},${salon.lng + 0.005},${salon.lat + 0.003}`;
+  const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${salon.lat},${salon.lng}`;
+
   return (
     <MobileShell>
       <PageHeader title={salon.name} subtitle={salon.area} back={() => nav({ to: "/home" })} />
 
       <div className="relative">
-        <GradientBlob hue={salon.hue} className="h-52 w-full" />
+        <img src={salon.cover} alt={salon.name} className="h-52 w-full object-cover" />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background to-transparent" />
       </div>
 
       <div className="px-4 -mt-10 relative">
         <div className="grid grid-cols-4 gap-2">
-          {salon.gallery.map((h, i) => (
-            <GradientBlob key={i} hue={h} className="h-16 rounded-xl border-2 border-background" />
+          {(salon.photos ?? []).map((p, i) => (
+            <img key={i} src={p} alt="" className="h-16 w-full object-cover rounded-xl border-2 border-background" />
           ))}
         </div>
 
@@ -54,16 +59,51 @@ function SalonDetails() {
         </div>
 
         <div className="mt-3 flex gap-2">
-          <Badge variant="secondary" className="font-normal"><Clock className="h-3 w-3 mr-1"/> {salon.hours}</Badge>
+          <Badge variant="secondary" className="font-normal"><Clock className="h-3 w-3 mr-1"/> Today {salon.hours}</Badge>
           <Badge variant="secondary" className="font-normal"><Users className="h-3 w-3 mr-1"/> {salon.crowd === "low" ? "No wait" : salon.crowd === "medium" ? "~10 min" : "~25 min"}</Badge>
         </div>
 
         <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{salon.description}</p>
 
         <div className="mt-4 flex gap-2">
-          <Button variant="outline" className="flex-1 rounded-xl"><Phone className="h-4 w-4 mr-1"/>Call</Button>
-          <Button variant="outline" className="flex-1 rounded-xl"><MapPin className="h-4 w-4 mr-1"/>Directions</Button>
+          <a href={`tel:${salon.phone}`} className="flex-1">
+            <Button variant="outline" className="w-full rounded-xl"><Phone className="h-4 w-4 mr-1"/>Call</Button>
+          </a>
+          <a href={`https://www.openstreetmap.org/?mlat=${salon.lat}&mlon=${salon.lng}#map=18/${salon.lat}/${salon.lng}`} target="_blank" rel="noreferrer" className="flex-1">
+            <Button variant="outline" className="w-full rounded-xl"><Navigation className="h-4 w-4 mr-1"/>Directions</Button>
+          </a>
         </div>
+
+        {/* Map */}
+        <section className="mt-6">
+          <h2 className="font-semibold mb-3 flex items-center gap-2"><MapPin className="h-4 w-4"/>Location</h2>
+          <div className="rounded-2xl overflow-hidden border border-border bg-card">
+            <iframe
+              title="Salon location"
+              src={mapSrc}
+              className="w-full h-48 border-0"
+              loading="lazy"
+            />
+            <div className="p-3 flex items-start gap-2">
+              <MapPin className="h-4 w-4 mt-0.5 text-primary"/>
+              <p className="text-xs text-muted-foreground flex-1">{salon.address}</p>
+              <a href={`https://www.google.com/maps/dir/?api=1&destination=${salon.lat},${salon.lng}`} target="_blank" rel="noreferrer" className="text-xs font-semibold text-primary">Open</a>
+            </div>
+          </div>
+        </section>
+
+        {/* Opening hours */}
+        <section className="mt-6">
+          <h2 className="font-semibold mb-3 flex items-center gap-2"><Clock className="h-4 w-4"/>Opening hours</h2>
+          <div className="rounded-2xl border border-border bg-card divide-y divide-border">
+            {salon.weeklyHours.map((h) => (
+              <div key={h.day} className={cn("flex items-center justify-between px-4 py-2.5 text-sm", h.day === today && "bg-primary/5")}>
+                <span className={cn("font-medium", h.day === today && "text-primary")}>{h.day}{h.day === today && " · Today"}</span>
+                <span className={cn(h.closed ? "text-destructive" : "text-muted-foreground")}>{h.open}</span>
+              </div>
+            ))}
+          </div>
+        </section>
 
         <section className="mt-6">
           <h2 className="font-semibold mb-3">Our team ({salon.barbers.length})</h2>
@@ -72,7 +112,7 @@ function SalonDetails() {
           </div>
         </section>
 
-        <section className="mt-6 mb-6">
+        <section className="mt-6">
           <h2 className="font-semibold mb-3">Popular services</h2>
           <div className="space-y-2">
             {salon.barbers[0].services.slice(0, 4).map((s) => (
@@ -88,12 +128,44 @@ function SalonDetails() {
             ))}
           </div>
         </section>
+
+        {/* Reviews */}
+        <section className="mt-6 mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold">Reviews ({salon.reviewCount})</h2>
+            <div className="flex items-center gap-1 text-sm font-semibold">
+              <Star className="h-4 w-4 fill-accent text-accent"/> {avgRating}
+            </div>
+          </div>
+          <div className="space-y-3">
+            {salon.reviews.map((r) => (
+              <div key={r.id} className="rounded-2xl border border-border bg-card p-3">
+                <div className="flex items-center gap-3">
+                  <img src={r.avatar} alt={r.name} className="h-10 w-10 rounded-full object-cover"/>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold truncate">{r.name}</p>
+                      <span className="text-[10px] text-muted-foreground">{r.date}</span>
+                    </div>
+                    <div className="flex items-center gap-0.5 mt-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className={cn("h-3 w-3", i < r.rating ? "fill-accent text-accent" : "text-muted-foreground/40")}/>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{r.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </MobileShell>
   );
 }
 
 function BarberCard({ barber, salonId }: { barber: Barber; salonId: string }) {
+  void salonId;
   const dot = barber.status === "free" ? "bg-emerald-500" : barber.status === "busy" ? "bg-rose-500" : "bg-muted-foreground";
   const label = barber.status === "free" ? "Free now" : barber.status === "busy" ? "With customer" : "Offline";
 
@@ -101,7 +173,7 @@ function BarberCard({ barber, salonId }: { barber: Barber; salonId: string }) {
     <div className="rounded-2xl border border-border bg-card p-3">
       <div className="flex items-start gap-3">
         <div className="relative">
-          <Avatar hue={barber.avatarHue} name={barber.name} size={52} />
+          <Avatar hue={barber.avatarHue} name={barber.name} size={52} src={barber.photo} />
           <span className={cn("absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full ring-2 ring-card", dot)} />
         </div>
         <div className="flex-1 min-w-0">
