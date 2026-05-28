@@ -1,16 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ShieldCheck, QrCode, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, QrCode, CheckCircle2, ChevronDown } from "lucide-react";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { Button } from "@/components/ui/button";
 import { getBarber, paymentMethods, type Barber, type Salon } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
-type Search = { service?: string; barber?: string; slot?: string };
+type Search = { services?: string; service?: string; barber?: string; slot?: string };
 
 export const Route = createFileRoute("/payment")({
   component: Payment,
   validateSearch: (s: Record<string, unknown>): Search => ({
+    services: typeof s.services === "string" ? s.services : undefined,
     service: typeof s.service === "string" ? s.service : undefined,
     barber: typeof s.barber === "string" ? s.barber : undefined,
     slot: typeof s.slot === "string" ? s.slot : undefined,
@@ -19,35 +20,72 @@ export const Route = createFileRoute("/payment")({
 
 function Payment() {
   const nav = useNavigate();
-  const { service, barber: barberId, slot } = Route.useSearch();
+  const { services: servicesParam, service, barber: barberId, slot } = Route.useSearch();
 
   const found = barberId ? getBarber(barberId) : null;
   const barber: Barber | undefined = found?.barber;
   const salon: Salon | undefined = found?.salon;
-  const svc = barber?.services.find((s) => s.id === service) ?? barber?.services[0];
+  const ids = servicesParam ? servicesParam.split(",") : service ? [service] : [];
+  const selectedServices = (barber?.services ?? []).filter((s) => ids.includes(s.id));
+  const services = selectedServices.length > 0 ? selectedServices : barber?.services.slice(0, 1) ?? [];
 
   const [method, setMethod] = useState("bkash");
   const [paying, setPaying] = useState(false);
+  const [summaryOpen, setSummaryOpen] = useState(true);
 
-  const total = (svc?.price ?? 0) + 20;
+  const subtotal = services.reduce((sum, s) => sum + s.price, 0);
+  const fee = 20;
+  const tax = Math.round(subtotal * 0.05);
+  const total = subtotal + fee + tax;
 
   function pay() {
     setPaying(true);
-    setTimeout(() => nav({ to: "/booking-success", search: { barber: barberId, service, slot, method } }), 1600);
+    setTimeout(() => nav({ to: "/booking-success", search: { barber: barberId, services: ids.join(","), slot, method } }), 1600);
   }
 
   return (
     <MobileShell>
       <PageHeader title="Checkout" subtitle={`${salon?.name ?? "Salon"} · ${slot ?? ""}`} back={() => history.back()} />
 
-      <div className="px-4 py-4 space-y-5">
-        <div className="rounded-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground p-4 shadow-lg shadow-primary/20">
+      <div className="px-4 py-4 pb-40 space-y-5">
+        <div className="liquid-glass rounded-2xl p-4">
           <p className="text-xs opacity-80">Amount to pay</p>
           <p className="text-3xl font-bold mt-1">{total}৳</p>
           <div className="mt-3 text-xs flex items-center gap-1 opacity-90">
             <ShieldCheck className="h-3.5 w-3.5"/> Secured by TrimGo Pay · 256-bit encrypted
           </div>
         </div>
+
+        {/* Collapsible order + payment summary */}
+        <section className="rounded-2xl bg-card border border-border overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setSummaryOpen((v) => !v)}
+            className="w-full px-4 py-3 flex items-center justify-between"
+          >
+            <div className="text-left">
+              <p className="text-sm font-semibold">Order summary</p>
+              <p className="text-[11px] text-muted-foreground">{services.length} service{services.length !== 1 ? "s" : ""} · with {barber?.name}</p>
+            </div>
+            <ChevronDown className={cn("h-4 w-4 transition-transform", summaryOpen && "rotate-180")}/>
+          </button>
+          {summaryOpen && (
+            <div className="px-4 pb-4 space-y-1.5 border-t border-border pt-3">
+              {services.map((s) => (
+                <div key={s.id} className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">{s.name} <span className="text-[10px]">· {s.duration}m</span></span>
+                  <span className="font-medium">{s.price}৳</span>
+                </div>
+              ))}
+              <div className="border-t border-border my-2"/>
+              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span>{subtotal}৳</span></div>
+              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Booking fee</span><span>{fee}৳</span></div>
+              <div className="flex justify-between text-sm"><span className="text-muted-foreground">VAT (5%)</span><span>{tax}৳</span></div>
+              <div className="border-t border-border my-2"/>
+              <div className="flex justify-between text-base font-bold"><span>Total</span><span>{total}৳</span></div>
+            </div>
+          )}
+        </section>
 
         <section>
           <h2 className="font-semibold text-sm mb-2">Choose payment method</h2>
@@ -99,8 +137,8 @@ function Payment() {
         )}
       </div>
 
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-md bg-background/95 backdrop-blur border-t border-border px-4 py-3">
-        <Button onClick={pay} disabled={paying} className="w-full h-12 rounded-xl font-semibold">
+      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-md bg-background/95 backdrop-blur border-t border-border px-4 py-3 z-30">
+        <Button onClick={pay} disabled={paying} className="liquid-glass w-full h-12 rounded-xl font-semibold">
           {paying ? (
             <span className="flex items-center gap-2">
               <span className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"/>

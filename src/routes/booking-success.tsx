@@ -5,24 +5,29 @@ import { Avatar } from "@/components/brand";
 import { getBarber, paymentMethods, type Barber, type Salon } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 
-type Search = { barber?: string; service?: string; slot?: string; method?: string };
+type Search = { barber?: string; service?: string; services?: string; slot?: string; method?: string };
 
 export const Route = createFileRoute("/booking-success")({
   component: Success,
   validateSearch: (s: Record<string, unknown>): Search => ({
     barber: typeof s.barber === "string" ? s.barber : undefined,
     service: typeof s.service === "string" ? s.service : undefined,
+    services: typeof s.services === "string" ? s.services : undefined,
     slot: typeof s.slot === "string" ? s.slot : undefined,
     method: typeof s.method === "string" ? s.method : undefined,
   }),
 });
 
 function Success() {
-  const { barber: barberId, service, slot, method } = Route.useSearch();
+  const { barber: barberId, service, services: servicesParam, slot, method } = Route.useSearch();
   const found = barberId ? getBarber(barberId) : null;
   const barber: Barber | undefined = found?.barber;
   const salon: Salon | undefined = found?.salon;
-  const svc = barber?.services.find((s) => s.id === service) ?? barber?.services[0];
+  const ids = servicesParam ? servicesParam.split(",") : service ? [service] : [];
+  const svcs = (barber?.services ?? []).filter((s) => ids.includes(s.id));
+  const list = svcs.length > 0 ? svcs : barber?.services.slice(0, 1) ?? [];
+  const subtotal = list.reduce((sum, s) => sum + s.price, 0);
+  const totalAmount = subtotal + 20 + Math.round(subtotal * 0.05);
   const pm = paymentMethods.find((p) => p.id === method);
   const bookingId = "TG-" + Math.floor(10000 + Math.random() * 89999);
 
@@ -52,7 +57,7 @@ function Success() {
           <div className="p-4 space-y-4">
             {barber && (
               <div className="flex items-center gap-3">
-                <Avatar hue={barber.avatarHue} name={barber.name} size={48} />
+                <Avatar hue={barber.avatarHue} name={barber.name} size={48} src={barber.photo} />
                 <div>
                   <p className="font-semibold">{barber.name}</p>
                   <p className="text-xs text-muted-foreground">{barber.designation} · {salon?.name}</p>
@@ -67,10 +72,10 @@ function Success() {
 
             <div className="border-t border-border pt-3 flex justify-between items-center">
               <div>
-                <p className="text-xs text-muted-foreground">{svc?.name}</p>
+                <p className="text-xs text-muted-foreground">{list.map((s) => s.name).join(", ")}</p>
                 <p className="text-xs text-muted-foreground">Paid via {pm?.name ?? "—"}</p>
               </div>
-              <p className="font-bold text-lg">{(svc?.price ?? 0) + 20}৳</p>
+              <p className="font-bold text-lg">{totalAmount}৳</p>
             </div>
           </div>
         </div>
