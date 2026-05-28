@@ -8,6 +8,7 @@ export type Barber = {
   rating: number;
   avatarHue: number;
   services: Service[];
+  photo?: string;
 };
 
 export type Service = {
@@ -35,6 +36,23 @@ export type Salon = {
   hue: number;
   barbers: Barber[];
   gallery: number[]; // hues for gradient placeholders
+  photos?: string[];
+  cover?: string;
+  lat: number;
+  lng: number;
+  address: string;
+  phone: string;
+  weeklyHours: { day: string; open: string; closed?: boolean }[];
+  reviews: Review[];
+};
+
+export type Review = {
+  id: string;
+  name: string;
+  avatar?: string;
+  rating: number;
+  date: string;
+  text: string;
 };
 
 const svc = (id: string, name: string, description: string, duration: number, price: number): Service => ({
@@ -53,8 +71,45 @@ const baseServices: Service[] = [
 const mkBarber = (
   id: string, name: string, designation: string, experience: string,
   skills: string[], status: Barber["status"], rating: number, hue: number,
-  services: Service[]
-): Barber => ({ id, name, designation, experience, skills, status, rating, avatarHue: hue, services });
+  services: Service[], photo?: string,
+): Barber => ({ id, name, designation, experience, skills, status, rating, avatarHue: hue, services, photo });
+
+// Unsplash dummy assets
+const U = (id: string, w = 400) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
+
+const barberPhotos = [
+  U("photo-1599351431202-1e0f0137899a"), // barber 1
+  U("photo-1622286342621-4bd786c2447c"), // barber 2
+  U("photo-1605497788044-5a32c7078486"), // barber 3
+  U("photo-1583195764036-6dc248ac07d9"), // barber 4
+  U("photo-1500648767791-00dcc994a43e"), // m1
+  U("photo-1508214751196-bcfd4ca60f91"), // m2
+  U("photo-1519085360753-af0119f7cbe7"), // m3
+  U("photo-1492562080023-ab3db95bfbce"), // m4
+  U("photo-1607990281513-2c110a25bd8c"), // f1
+  U("photo-1580489944761-15a19d654956"), // f2
+];
+
+const salonPhotos1 = [U("photo-1521590832167-7bcbfaa6381f", 800), U("photo-1503951914875-452162b0f3f1", 800), U("photo-1622286342621-4bd786c2447c", 800), U("photo-1585747860715-2ba37e788b70", 800)];
+const salonPhotos2 = [U("photo-1503951914875-452162b0f3f1", 800), U("photo-1599351431202-1e0f0137899a", 800), U("photo-1493256338651-d82f7acb2b38", 800), U("photo-1535930891776-0c2dfb7fda1a", 800)];
+const salonPhotos3 = [U("photo-1532710093739-9470acff878f", 800), U("photo-1521490214180-77af1057d738", 800), U("photo-1622287162716-f311baa1a2b8", 800), U("photo-1622286346003-c5c7e63b1088", 800)];
+
+const defaultHours = [
+  { day: "Mon", open: "10:00 AM — 10:00 PM" },
+  { day: "Tue", open: "10:00 AM — 10:00 PM" },
+  { day: "Wed", open: "10:00 AM — 10:00 PM" },
+  { day: "Thu", open: "10:00 AM — 10:00 PM" },
+  { day: "Fri", open: "10:00 AM — 11:00 PM" },
+  { day: "Sat", open: "9:00 AM — 11:00 PM" },
+  { day: "Sun", open: "Closed", closed: true },
+];
+
+const sampleReviews = (seed: number): Review[] => [
+  { id: `r${seed}1`, name: "Anika Rahman", avatar: U("photo-1494790108377-be9c29b29330"), rating: 5, date: "2 days ago", text: "Absolutely loved the experience. Rohim gave me the cleanest fade I've had in years. Highly recommend!" },
+  { id: `r${seed}2`, name: "Mahin Khan", avatar: U("photo-1535713875002-d1d0cf377fde"), rating: 5, date: "1 week ago", text: "Premium vibe, super hygienic and the chai while waiting was a nice touch. Booking via the app was effortless." },
+  { id: `r${seed}3`, name: "Sumaiya Islam", avatar: U("photo-1438761681033-6461ffad8d80"), rating: 4, date: "2 weeks ago", text: "Color came out beautiful. Took slightly longer than promised but worth it." },
+  { id: `r${seed}4`, name: "Rafsan Ahmed", avatar: U("photo-1500648767791-00dcc994a43e"), rating: 5, date: "3 weeks ago", text: "Best barbershop in Dhaka, hands down. Already booked my next slot." },
+];
 
 export const salons: Salon[] = [
   {
