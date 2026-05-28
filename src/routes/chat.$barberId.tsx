@@ -65,7 +65,7 @@ function ChatPage() {
       />
 
       <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center gap-3">
-        <Avatar hue={barber.avatarHue} name={barber.name} size={36} />
+        <Avatar hue={barber.avatarHue} name={barber.name} size={36} src={barber.photo} />
         <div className="flex-1 min-w-0">
           <p className="text-xs text-muted-foreground">Chatting with</p>
           <p className="text-sm font-semibold truncate">{barber.designation} at {salon.name}</p>
@@ -112,7 +112,7 @@ function Bubble({ msg, barber }: { msg: Msg; barber: Barber }) {
   const me = msg.from === "me";
   return (
     <div className={cn("flex gap-2 items-end", me && "justify-end")}>
-      {!me && <Avatar hue={barber.avatarHue} name={barber.name} size={26} />}
+      {!me && <Avatar hue={barber.avatarHue} name={barber.name} size={26} src={barber.photo} />}
       <div className={cn(
         "max-w-[78%] px-3 py-2 rounded-2xl text-sm leading-relaxed",
         me ? "bg-primary text-primary-foreground rounded-br-md" : "bg-secondary text-secondary-foreground rounded-bl-md"
@@ -129,7 +129,7 @@ function Bubble({ msg, barber }: { msg: Msg; barber: Barber }) {
 function TypingBubble({ barber }: { barber: Barber }) {
   return (
     <div className="flex gap-2 items-end">
-      <Avatar hue={barber.avatarHue} name={barber.name} size={26} />
+      <Avatar hue={barber.avatarHue} name={barber.name} size={26} src={barber.photo} />
       <div className="bg-secondary px-3 py-3 rounded-2xl rounded-bl-md flex gap-1">
         <span className="h-1.5 w-1.5 bg-muted-foreground rounded-full animate-bounce" />
         <span className="h-1.5 w-1.5 bg-muted-foreground rounded-full animate-bounce [animation-delay:120ms]" />
