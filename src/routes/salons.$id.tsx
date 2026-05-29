@@ -76,6 +76,13 @@ function SalonDetails() {
           </a>
         </div>
 
+        <section className="mt-6">
+          <h2 className="font-semibold mb-3">Our team ({salon.barbers.length})</h2>
+          <div className="space-y-3">
+            {salon.barbers.map((b) => <BarberCard key={b.id} barber={b} salonId={salon.id} />)}
+          </div>
+        </section>
+
         {/* Map */}
         <section className="mt-6">
           <h2 className="font-semibold mb-3 flex items-center gap-2"><MapPin className="h-4 w-4"/>Location</h2>
@@ -124,13 +131,6 @@ function SalonDetails() {
                 ))}
               </div>
             )}
-          </div>
-        </section>
-
-        <section className="mt-6">
-          <h2 className="font-semibold mb-3">Our team ({salon.barbers.length})</h2>
-          <div className="space-y-3">
-            {salon.barbers.map((b) => <BarberCard key={b.id} barber={b} salonId={salon.id} />)}
           </div>
         </section>
 
