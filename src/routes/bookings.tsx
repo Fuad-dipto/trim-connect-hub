@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Calendar, MapPin, MessageCircle, Navigation, CalendarClock, X, RotateCcw, Star } from "lucide-react";
+import { Calendar, MapPin, MessageCircle, Navigation, CalendarClock, X, RotateCcw, Star, Receipt } from "lucide-react";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
 import { salons } from "@/lib/mock-data";
@@ -21,6 +21,8 @@ type Booking = {
   svc: string;
   id: string;
   status: string;
+  serviceIds: string[];
+  method: string;
 };
 
 function Bookings() {
@@ -28,13 +30,13 @@ function Bookings() {
   const [cancelled, setCancelled] = useState<string[]>([]);
 
   const upcoming: Booking[] = [
-    { salon: salons[0], barber: salons[0].barbers[0], time: "Today · 12:30 PM", svc: "Classic Haircut + Beard Trim", id: "TG-88241", status: "Confirmed" },
-    { salon: salons[4], barber: salons[4].barbers[0], time: "Tomorrow · 4:00 PM", svc: "Fade & Beard", id: "TG-88311", status: "Confirmed" },
+    { salon: salons[0], barber: salons[0].barbers[0], time: "Today · 12:30 PM", svc: "Classic Haircut + Beard Trim", id: "TG-88241", status: "Confirmed", serviceIds: ["s1", "s2"], method: "bkash" },
+    { salon: salons[4], barber: salons[4].barbers[0], time: "Tomorrow · 4:00 PM", svc: "Fade & Beard", id: "TG-88311", status: "Confirmed", serviceIds: ["s1", "s2"], method: "nagad" },
   ].filter((b) => !cancelled.includes(b.id));
 
   const past: Booking[] = [
-    { salon: salons[1], barber: salons[1].barbers[0], time: "May 22 · 11:00 AM", svc: "Royal Shave", id: "TG-87102", status: "Completed" },
-    { salon: salons[2], barber: salons[2].barbers[0], time: "May 15 · 9:30 AM", svc: "Kids Cut", id: "TG-86411", status: "Completed" },
+    { salon: salons[1], barber: salons[1].barbers[0], time: "May 22 · 11:00 AM", svc: "Royal Shave", id: "TG-87102", status: "Completed", serviceIds: ["s6"], method: "card" },
+    { salon: salons[2], barber: salons[2].barbers[0], time: "May 15 · 9:30 AM", svc: "Kids Cut", id: "TG-86411", status: "Completed", serviceIds: ["s5"], method: "cash" },
   ];
 
   return (
@@ -77,7 +79,9 @@ function Bookings() {
 }
 
 function BCard({ booking, isPast, onCancel }: { booking: Booking; isPast: boolean; onCancel: () => void }) {
-  const { salon, barber, time, svc, id, status } = booking;
+  const { salon, barber, time, svc, id, status, serviceIds, method } = booking;
+  const slot = time.split("·")[1]?.trim() ?? time;
+  const receiptSearch = { barber: barber.id, services: serviceIds.join(","), slot, method };
   return (
     <div className="rounded-2xl bg-card border border-border p-3.5 space-y-3">
       <div className="flex items-center gap-3">
@@ -100,7 +104,10 @@ function BCard({ booking, isPast, onCancel }: { booking: Booking; isPast: boolea
       </div>
 
       {!isPast ? (
-        <div className="grid grid-cols-4 gap-1.5 pt-1 border-t border-border">
+        <div className="grid grid-cols-5 gap-1.5 pt-1 border-t border-border">
+          <Link to="/booking-success" search={receiptSearch} className="flex flex-col items-center gap-0.5 py-2 rounded-lg hover:bg-secondary/60 text-[10px] font-medium">
+            <Receipt className="h-4 w-4 text-primary"/>Receipt
+          </Link>
           <Link to="/chat/$barberId" params={{ barberId: barber.id }} className="flex flex-col items-center gap-0.5 py-2 rounded-lg hover:bg-secondary/60 text-[10px] font-medium">
             <MessageCircle className="h-4 w-4 text-primary"/>Chat
           </Link>
@@ -138,7 +145,10 @@ function BCard({ booking, isPast, onCancel }: { booking: Booking; isPast: boolea
           </AlertDialog>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-border">
+        <div className="grid grid-cols-3 gap-1.5 pt-1 border-t border-border">
+          <Link to="/booking-success" search={receiptSearch} className="flex items-center justify-center gap-1 py-2 rounded-lg hover:bg-secondary/60 text-xs font-medium">
+            <Receipt className="h-4 w-4 text-primary"/>Receipt
+          </Link>
           <button onClick={() => toast.success("Thanks for rating!")} className="flex items-center justify-center gap-1 py-2 rounded-lg hover:bg-secondary/60 text-xs font-medium">
             <Star className="h-4 w-4 text-accent"/>Rate
           </button>

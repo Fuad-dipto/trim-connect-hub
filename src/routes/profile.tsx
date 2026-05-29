@@ -1,17 +1,40 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
 import { ChevronRight, Heart, CreditCard, MapPin, Bell, HelpCircle, LogOut, Store, Moon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/profile")({ component: Profile });
 
 function Profile() {
-  const items = [
+  const [dark, setDark] = useState(false);
+  const [favCount, setFavCount] = useState(4);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("tg.theme");
+    const isDark = stored ? stored === "dark" : document.documentElement.classList.contains("dark");
+    setDark(isDark);
+    document.documentElement.classList.toggle("dark", isDark);
+    try {
+      const favs: string[] = JSON.parse(localStorage.getItem("tg.favs") ?? "[]");
+      setFavCount(favs.length);
+    } catch { /* ignore */ }
+  }, []);
+
+  function toggleDark() {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.classList.toggle("dark", next);
+    localStorage.setItem("tg.theme", next ? "dark" : "light");
+  }
+
+  const items: { icon: typeof Heart; label: string; toggle?: boolean; onClick?: () => void; active?: boolean }[] = [
     { icon: Heart, label: "Favorite salons" },
     { icon: CreditCard, label: "Payment methods" },
     { icon: MapPin, label: "Saved addresses" },
     { icon: Bell, label: "Notifications" },
-    { icon: Moon, label: "Dark mode", toggle: true },
+    { icon: Moon, label: "Dark mode", toggle: true, onClick: toggleDark, active: dark },
     { icon: HelpCircle, label: "Help & support" },
   ];
 
@@ -29,7 +52,7 @@ function Profile() {
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-2">
-          {[["12", "Bookings"], ["4", "Favorites"], ["4.8", "Rating"]].map(([v, l]) => (
+          {[["12", "Bookings"], [String(favCount), "Favorites"], ["4.8", "Rating"]].map(([v, l]) => (
             <div key={l} className="rounded-xl bg-card border border-border p-3 text-center">
               <p className="font-bold text-lg">{v}</p>
               <p className="text-[11px] text-muted-foreground">{l}</p>
@@ -47,13 +70,13 @@ function Profile() {
         </Link>
 
         <ul className="mt-4 rounded-2xl bg-card border border-border overflow-hidden">
-          {items.map(({ icon: Icon, label, toggle }) => (
+          {items.map(({ icon: Icon, label, toggle, onClick, active }) => (
             <li key={label}>
-              <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 border-b border-border last:border-0">
+              <button onClick={onClick} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 border-b border-border last:border-0">
                 <Icon className="h-4 w-4 text-muted-foreground"/>
                 <span className="flex-1 text-sm text-left">{label}</span>
                 {toggle ? (
-                  <span className="h-5 w-9 rounded-full bg-muted flex items-center px-0.5">
+                  <span className={cn("h-5 w-9 rounded-full flex items-center px-0.5 transition-colors", active ? "bg-primary justify-end" : "bg-muted")}>
                     <span className="h-4 w-4 rounded-full bg-card shadow"/>
                   </span>
                 ) : <ChevronRight className="h-4 w-4 text-muted-foreground"/>}
