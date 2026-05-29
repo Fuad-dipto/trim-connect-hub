@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
-import { MapPin, Star, Clock, Phone, MessageCircle, Users, ChevronRight, Navigation } from "lucide-react";
+import { MapPin, Star, Clock, Phone, MessageCircle, Users, ChevronRight, Navigation, ChevronDown } from "lucide-react";
+import { useState } from "react";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
 import { getSalon, type Barber, type Salon } from "@/lib/mock-data";
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/salons/$id")({
 function SalonDetails() {
   const { salon } = Route.useLoaderData() as { salon: Salon };
   const nav = useNavigate();
+  const [hoursOpen, setHoursOpen] = useState(false);
 
   const today = new Date().toLocaleDateString("en-US", { weekday: "short" }).slice(0, 3);
   const avgRating = salon.rating;
@@ -94,14 +96,34 @@ function SalonDetails() {
 
         {/* Opening hours */}
         <section className="mt-6">
-          <h2 className="font-semibold mb-3 flex items-center gap-2"><Clock className="h-4 w-4"/>Opening hours</h2>
-          <div className="rounded-2xl border border-border bg-card divide-y divide-border">
-            {salon.weeklyHours.map((h) => (
-              <div key={h.day} className={cn("flex items-center justify-between px-4 py-2.5 text-sm", h.day === today && "bg-primary/5")}>
-                <span className={cn("font-medium", h.day === today && "text-primary")}>{h.day}{h.day === today && " · Today"}</span>
-                <span className={cn(h.closed ? "text-destructive" : "text-muted-foreground")}>{h.open}</span>
+          <div className="rounded-2xl border border-border bg-card overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setHoursOpen((v) => !v)}
+              className="w-full flex items-center justify-between px-4 py-3 text-sm"
+              aria-expanded={hoursOpen}
+            >
+              <span className="flex items-center gap-2 font-semibold">
+                <Clock className="h-4 w-4"/> Opening hours
+              </span>
+              <span className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className={cn(salon.isOpen ? "text-emerald-600" : "text-destructive", "font-medium")}>
+                  {salon.isOpen ? "Open now" : "Closed"}
+                </span>
+                · Today {salon.hours}
+                <ChevronDown className={cn("h-4 w-4 transition-transform", hoursOpen && "rotate-180")}/>
+              </span>
+            </button>
+            {hoursOpen && (
+              <div className="divide-y divide-border border-t border-border">
+                {salon.weeklyHours.map((h) => (
+                  <div key={h.day} className={cn("flex items-center justify-between px-4 py-2.5 text-sm", h.day === today && "bg-primary/5")}>
+                    <span className={cn("font-medium", h.day === today && "text-primary")}>{h.day}{h.day === today && " · Today"}</span>
+                    <span className={cn(h.closed ? "text-destructive" : "text-muted-foreground")}>{h.open}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         </section>
 
@@ -137,15 +159,15 @@ function SalonDetails() {
               <Star className="h-4 w-4 fill-accent text-accent"/> {avgRating}
             </div>
           </div>
-          <div className="space-y-3">
+          <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 snap-x snap-mandatory scrollbar-none">
             {salon.reviews.map((r) => (
-              <div key={r.id} className="rounded-2xl border border-border bg-card p-3">
+              <div key={r.id} className="snap-start shrink-0 w-[78%] rounded-2xl border border-border bg-card p-3">
                 <div className="flex items-center gap-3">
                   <img src={r.avatar} alt={r.name} className="h-10 w-10 rounded-full object-cover"/>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-semibold truncate">{r.name}</p>
-                      <span className="text-[10px] text-muted-foreground">{r.date}</span>
+                      <span className="text-[10px] text-muted-foreground shrink-0">{r.date}</span>
                     </div>
                     <div className="flex items-center gap-0.5 mt-0.5">
                       {Array.from({ length: 5 }).map((_, i) => (
@@ -154,7 +176,7 @@ function SalonDetails() {
                     </div>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{r.text}</p>
+                <p className="text-xs text-muted-foreground mt-2 leading-relaxed line-clamp-4">{r.text}</p>
               </div>
             ))}
           </div>
