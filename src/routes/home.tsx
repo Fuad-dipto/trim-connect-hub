@@ -5,7 +5,6 @@ import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { GradientBlob, Avatar } from "@/components/brand";
 import { salons, type Salon } from "@/lib/mock-data";
 import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -29,13 +28,12 @@ const sortOptions = [
 function Home() {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState("all");
-  const [range, setRange] = useState<[number, number]>([100, 2000]);
   const [sort, setSort] = useState("nearest");
   const [view, setView] = useState<"list" | "map">("list");
 
   const filtered = useMemo(() => {
     const f = quickFilters.find((x) => x.id === filter)!;
-    const [lo, hi] = filter === "all" ? range : f.range;
+    const [lo, hi] = f.range;
     let r = salons.filter((s) =>
       s.priceMin <= hi && s.priceMax >= lo &&
       (q.trim() === "" || (s.name + s.area).toLowerCase().includes(q.toLowerCase()))
@@ -48,7 +46,7 @@ function Home() {
       return b.reviewCount - a.reviewCount;
     });
     return r;
-  }, [q, filter, range, sort]);
+  }, [q, filter, sort]);
 
   return (
     <MobileShell>
@@ -91,16 +89,6 @@ function Home() {
             </button>
           ))}
         </div>
-
-        {filter === "all" && (
-          <div className="mt-3 rounded-2xl bg-card border border-border p-4">
-            <div className="flex justify-between text-xs text-muted-foreground mb-2">
-              <span>Custom range</span>
-              <span className="font-semibold text-foreground">{range[0]}৳ — {range[1]}৳</span>
-            </div>
-            <Slider min={100} max={2000} step={50} value={range} onValueChange={(v) => setRange([v[0], v[1]] as [number, number])} />
-          </div>
-        )}
 
         <div className="mt-4 flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
           <div className="shrink-0 flex items-center gap-1 text-xs text-muted-foreground"><SlidersHorizontal className="h-3.5 w-3.5"/>Sort</div>
