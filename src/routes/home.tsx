@@ -92,16 +92,6 @@ function Home() {
           ))}
         </div>
 
-        {filter === "all" && (
-          <div className="mt-3 rounded-2xl bg-card border border-border p-4">
-            <div className="flex justify-between text-xs text-muted-foreground mb-2">
-              <span>Custom range</span>
-              <span className="font-semibold text-foreground">{range[0]}৳ — {range[1]}৳</span>
-            </div>
-            <Slider min={100} max={2000} step={50} value={range} onValueChange={(v) => setRange([v[0], v[1]] as [number, number])} />
-          </div>
-        )}
-
         <div className="mt-4 flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
           <div className="shrink-0 flex items-center gap-1 text-xs text-muted-foreground"><SlidersHorizontal className="h-3.5 w-3.5"/>Sort</div>
           {sortOptions.map((o) => (
