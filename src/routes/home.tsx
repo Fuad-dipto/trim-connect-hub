@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { MapPin, Search, SlidersHorizontal, Star, Users, Bell, Map } from "lucide-react";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
-import { GradientBlob, Avatar } from "@/components/brand";
+import { Avatar } from "@/components/brand";
 import { salons, type Salon } from "@/lib/mock-data";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -120,7 +120,8 @@ function SalonCard({ salon }: { salon: Salon }) {
     <Link to="/salons/$id" params={{ id: salon.id }} className="block group">
       <div className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10 transition">
         <div className="relative h-32">
-          <GradientBlob hue={salon.hue} className="h-full w-full" />
+          <img src={salon.cover} alt={salon.name} className="h-full w-full object-cover" loading="lazy" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
           <div className="absolute top-2 left-2 flex gap-1">
             <Badge className={cn("text-[10px]", salon.isOpen ? "bg-emerald-500 hover:bg-emerald-500" : "bg-muted text-muted-foreground hover:bg-muted")}>
               {salon.isOpen ? "Open now" : "Closed"}
