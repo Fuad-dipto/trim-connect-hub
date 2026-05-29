@@ -5,7 +5,6 @@ import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { GradientBlob, Avatar } from "@/components/brand";
 import { salons, type Salon } from "@/lib/mock-data";
 import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -29,13 +28,12 @@ const sortOptions = [
 function Home() {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState("all");
-  const [range, setRange] = useState<[number, number]>([100, 2000]);
   const [sort, setSort] = useState("nearest");
   const [view, setView] = useState<"list" | "map">("list");
 
   const filtered = useMemo(() => {
     const f = quickFilters.find((x) => x.id === filter)!;
-    const [lo, hi] = filter === "all" ? range : f.range;
+    const [lo, hi] = f.range;
     let r = salons.filter((s) =>
       s.priceMin <= hi && s.priceMax >= lo &&
       (q.trim() === "" || (s.name + s.area).toLowerCase().includes(q.toLowerCase()))
@@ -48,7 +46,7 @@ function Home() {
       return b.reviewCount - a.reviewCount;
     });
     return r;
-  }, [q, filter, range, sort]);
+  }, [q, filter, sort]);
 
   return (
     <MobileShell>
