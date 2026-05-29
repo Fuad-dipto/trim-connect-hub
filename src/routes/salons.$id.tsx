@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
-import { MapPin, Star, Clock, Phone, MessageCircle, Users, ChevronRight, Navigation, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { MapPin, Star, Clock, Phone, MessageCircle, Users, ChevronRight, Navigation, ChevronDown, Heart, Share2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
 import { getSalon, type Barber, type Salon } from "@/lib/mock-data";
@@ -21,6 +22,24 @@ function SalonDetails() {
   const { salon } = Route.useLoaderData() as { salon: Salon };
   const nav = useNavigate();
   const [hoursOpen, setHoursOpen] = useState(false);
+  const [fav, setFav] = useState(false);
+
+  useEffect(() => {
+    try {
+      const favs: string[] = JSON.parse(localStorage.getItem("tg.favs") ?? "[]");
+      setFav(favs.includes(salon.id));
+    } catch { /* ignore */ }
+  }, [salon.id]);
+
+  function toggleFav() {
+    try {
+      const favs: string[] = JSON.parse(localStorage.getItem("tg.favs") ?? "[]");
+      const next = favs.includes(salon.id) ? favs.filter((s) => s !== salon.id) : [...favs, salon.id];
+      localStorage.setItem("tg.favs", JSON.stringify(next));
+      setFav(next.includes(salon.id));
+      toast.success(next.includes(salon.id) ? "Added to favorites" : "Removed from favorites");
+    } catch { /* ignore */ }
+  }
 
   const today = new Date().toLocaleDateString("en-US", { weekday: "short" }).slice(0, 3);
   const avgRating = salon.rating;
@@ -34,6 +53,26 @@ function SalonDetails() {
       <div className="relative">
         <img src={salon.cover} alt={salon.name} className="h-52 w-full object-cover" />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background to-transparent" />
+        <div className="absolute top-3 right-3 flex gap-2">
+          <button
+            onClick={() => { navigator.share?.({ title: salon.name, url: location.href }).catch(() => {}); toast.success("Share link ready"); }}
+            className="h-10 w-10 rounded-full bg-background/80 backdrop-blur border border-border flex items-center justify-center"
+            aria-label="Share"
+          >
+            <Share2 className="h-4 w-4"/>
+          </button>
+          <button
+            onClick={toggleFav}
+            className={cn(
+              "h-10 w-10 rounded-full backdrop-blur border border-border flex items-center justify-center transition",
+              fav ? "bg-rose-500 text-white border-rose-500" : "bg-background/80",
+            )}
+            aria-label="Favorite"
+            aria-pressed={fav}
+          >
+            <Heart className={cn("h-4 w-4", fav && "fill-current")}/>
+          </button>
+        </div>
       </div>
 
       <div className="px-4 -mt-10 relative">
