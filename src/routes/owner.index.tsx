@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { TrendingUp, Users, Calendar, DollarSign, Star, Plus, Scissors } from "lucide-react";
+import { TrendingUp, Users, Calendar, DollarSign, Star, Plus, Scissors, MessageSquare } from "lucide-react";
 import { OwnerShell } from "@/components/owner-shell";
 import { Avatar } from "@/components/brand";
-import { ownerStats, recentBookings, earningsTrend } from "@/lib/mock-data";
+import { ownerStats, recentBookings, earningsTrend, salons } from "@/lib/mock-data";
 import { useOwnerStore } from "@/lib/owner-store";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,13 @@ function Dashboard() {
   const services = useOwnerStore((s) => s.services);
   const profile = useOwnerStore((s) => s.profile);
   const activeCount = employees.filter((e) => e.status !== "offline").length;
+  const reviews = salons[0].reviews;
+  const avgRating = (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1);
+  const dist = [5, 4, 3, 2, 1].map((s) => ({
+    star: s,
+    count: reviews.filter((r) => r.rating === s).length,
+  }));
+  const total = reviews.length;
 
   return (
     <OwnerShell
@@ -122,6 +129,69 @@ function Dashboard() {
               ))}
             </tbody>
           </table>
+        </div>
+      </section>
+
+      {/* Customer reviews */}
+      <section className="mt-6 rounded-2xl bg-card border border-border p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4 text-muted-foreground"/>
+            <h2 className="font-semibold">Customer reviews</h2>
+          </div>
+          <Link to="/owner/settings" className="text-xs text-primary font-medium">Reply →</Link>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {/* Rating summary */}
+          <div className="rounded-xl bg-gradient-to-br from-secondary/60 to-accent/10 border border-border p-4 flex flex-col items-center justify-center text-center">
+            <p className="text-5xl font-bold tracking-tight">{avgRating}</p>
+            <div className="flex items-center gap-0.5 mt-1">
+              {[1,2,3,4,5].map((i) => (
+                <Star key={i} className={cn("h-4 w-4", i <= Math.round(Number(avgRating)) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/40")}/>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">{total} reviews this month</p>
+            <div className="w-full mt-4 space-y-1.5">
+              {dist.map((d) => (
+                <div key={d.star} className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                  <span className="w-3">{d.star}</span>
+                  <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400"/>
+                  <div className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
+                    <div className="h-full bg-amber-400" style={{ width: `${(d.count / total) * 100}%` }}/>
+                  </div>
+                  <span className="w-4 text-right">{d.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Review list */}
+          <ul className="lg:col-span-2 space-y-3">
+            {reviews.slice(0, 3).map((r) => (
+              <li key={r.id} className="rounded-xl border border-border p-4 hover:border-foreground/30 transition">
+                <div className="flex items-start gap-3">
+                  <Avatar hue={r.id.charCodeAt(1) * 30 % 360} name={r.name} src={r.avatar} size={36}/>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-semibold truncate">{r.name}</p>
+                      <span className="text-[10px] text-muted-foreground whitespace-nowrap">{r.date}</span>
+                    </div>
+                    <div className="flex items-center gap-0.5 mt-0.5">
+                      {[1,2,3,4,5].map((i) => (
+                        <Star key={i} className={cn("h-3 w-3", i <= r.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30")}/>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{r.text}</p>
+                    <div className="flex gap-2 mt-3">
+                      <button className="text-[10px] px-2.5 py-1 rounded-md bg-foreground text-background font-medium hover:opacity-90">Reply</button>
+                      <button className="text-[10px] px-2.5 py-1 rounded-md bg-secondary text-foreground font-medium hover:bg-secondary/70">Mark featured</button>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
     </OwnerShell>
