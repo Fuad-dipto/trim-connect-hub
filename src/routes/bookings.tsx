@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 export const Route = createFileRoute("/bookings")({ component: Bookings });
 
@@ -28,6 +29,7 @@ type Booking = {
 function Bookings() {
   const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
   const [cancelled, setCancelled] = useState<string[]>([]);
+  const { t } = useT();
 
   const upcoming: Booking[] = [
     { salon: salons[0], barber: salons[0].barbers[0], time: "Today · 12:30 PM", svc: "Classic Haircut + Beard Trim", id: "TG-88241", status: "Confirmed", serviceIds: ["s1", "s2"], method: "bkash" },
@@ -41,7 +43,7 @@ function Bookings() {
 
   return (
     <MobileShell>
-      <PageHeader title="My bookings" subtitle="Manage your appointments" />
+      <PageHeader title={t("My bookings")} subtitle={t("Manage your appointments")} />
       <div className="px-4 pt-3">
         <div className="grid grid-cols-2 rounded-xl bg-secondary p-1 text-sm font-medium">
           {(["upcoming", "past"] as const).map((t) => (
@@ -53,7 +55,7 @@ function Bookings() {
                 tab === t ? "bg-card shadow-sm text-foreground" : "text-muted-foreground",
               )}
             >
-              {t} ({t === "upcoming" ? upcoming.length : past.length})
+              {t === "upcoming" ? this : null}
             </button>
           ))}
         </div>
