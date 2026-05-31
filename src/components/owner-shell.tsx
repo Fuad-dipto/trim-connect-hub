@@ -10,21 +10,23 @@ import {
   DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 type NavItem = { to: string; icon: typeof LayoutDashboard; label: string; exact?: boolean };
-const nav: NavItem[] = [
-  { to: "/owner", icon: LayoutDashboard, label: "Dashboard", exact: true },
-  { to: "/owner/barbers", icon: Users, label: "Employees" },
-  { to: "/owner/services", icon: Scissors, label: "Services" },
-  { to: "/owner/bookings", icon: CalendarDays, label: "Bookings" },
-  { to: "/owner/settings", icon: Settings, label: "Salon profile" },
-];
 
 export function OwnerShell({ title, subtitle, action, children }: {
   title: string; subtitle?: string; action?: React.ReactNode; children: React.ReactNode;
 }) {
   const { location } = useRouterState();
   const [dark, setDark] = useState(false);
+  const { t } = useT();
+  const nav: NavItem[] = [
+    { to: "/owner", icon: LayoutDashboard, label: t("Dashboard"), exact: true },
+    { to: "/owner/barbers", icon: Users, label: t("Employees") },
+    { to: "/owner/services", icon: Scissors, label: t("Services") },
+    { to: "/owner/bookings", icon: CalendarDays, label: t("Bookings") },
+    { to: "/owner/settings", icon: Settings, label: t("Salon profile") },
+  ];
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
   }, [dark]);
@@ -36,7 +38,7 @@ export function OwnerShell({ title, subtitle, action, children }: {
         <aside className="hidden md:flex w-64 shrink-0 flex-col gap-1 p-4 border-r border-border bg-card min-h-screen sticky top-0">
           <div className="px-2 py-3"><Brand /></div>
           <div className="px-2 mb-3">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Salon owner</span>
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t("Salon owner")}</span>
           </div>
           <nav className="flex-1 space-y-1">
             {nav.map((n) => {
@@ -57,20 +59,20 @@ export function OwnerShell({ title, subtitle, action, children }: {
             <Avatar hue={75} name="Anwar Hossain" size={36}/>
             <div className="text-xs min-w-0 flex-1">
               <p className="font-semibold truncate">Anwar Hossain</p>
-              <p className="text-muted-foreground truncate">Owner · Luxe Cuts</p>
+              <p className="text-muted-foreground truncate">{t("Owner")} · Luxe Cuts</p>
             </div>
           </div>
         </aside>
 
         {/* Main */}
         <main className="flex-1 min-w-0">
-          <header className="sticky top-0 z-30 bg-background/80 backdrop-blur border-b border-border px-4 md:px-8 py-3 flex items-center justify-between gap-3">
+          <header className="sticky top-0 z-30 bg-background/80 backdrop-blur border-b border-border px-4 md:px-8 py-3 pr-28 flex items-center justify-between gap-3">
             <div className="md:hidden"><Brand size="sm"/></div>
             <div className="hidden md:flex items-center gap-3 flex-1 max-w-md">
               <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
                 <input
-                  placeholder="Search employees, services, bookings…"
+                  placeholder={t("Search employees, services, bookings…")}
                   className="h-10 w-full rounded-xl bg-secondary/70 border border-transparent focus:border-accent focus:bg-background outline-none pl-9 pr-3 text-sm"
                 />
               </div>
@@ -80,7 +82,7 @@ export function OwnerShell({ title, subtitle, action, children }: {
               <button
                 onClick={() => setDark((d) => !d)}
                 className="h-9 w-9 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/70"
-                aria-label="Toggle theme"
+                aria-label={t("Toggle theme")}
               >
                 {dark ? <Sun className="h-4 w-4"/> : <Moon className="h-4 w-4"/>}
               </button>
@@ -100,14 +102,14 @@ export function OwnerShell({ title, subtitle, action, children }: {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator/>
                   <DropdownMenuItem asChild>
-                    <Link to="/owner/settings"><UserCircle2 className="h-4 w-4 mr-2"/>Salon profile</Link>
+                    <Link to="/owner/settings"><UserCircle2 className="h-4 w-4 mr-2"/>{t("Salon profile")}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/owner/settings"><Settings className="h-4 w-4 mr-2"/>Settings</Link>
+                    <Link to="/owner/settings"><Settings className="h-4 w-4 mr-2"/>{t("Settings")}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator/>
                   <DropdownMenuItem asChild>
-                    <Link to="/"><LogOut className="h-4 w-4 mr-2"/>Sign out</Link>
+                    <Link to="/"><LogOut className="h-4 w-4 mr-2"/>{t("Sign out")}</Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

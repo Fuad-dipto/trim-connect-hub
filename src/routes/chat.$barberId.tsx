@@ -5,6 +5,7 @@ import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
 import { getBarber, type Barber, type Salon } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 export const Route = createFileRoute("/chat/$barberId")({
   component: ChatPage,
@@ -21,6 +22,7 @@ function ChatPage() {
   const data = Route.useLoaderData() as { salon: Salon; barber: Barber };
   const { barber, salon } = data;
   const nav = useNavigate();
+  const { t } = useT();
 
   const [msgs, setMsgs] = useState<Msg[]>([
     { id: "1", from: "them", text: `Hello! Thanks for reaching out to ${salon.name} 👋`, time: "10:42", read: true },
@@ -55,7 +57,7 @@ function ChatPage() {
       <PageHeader
         back={() => nav({ to: "/salons/$id", params: { id: salon.id } })}
         title={barber.name}
-        subtitle={barber.status === "free" ? "Online · typically replies in minutes" : "Online"}
+        subtitle={barber.status === "free" ? t("Online · typically replies in minutes") : t("Online")}
         right={
           <div className="flex gap-1">
             <button className="h-9 w-9 rounded-full bg-secondary flex items-center justify-center"><Phone className="h-4 w-4"/></button>
@@ -67,17 +69,17 @@ function ChatPage() {
       <div className="px-4 py-3 border-b border-border bg-secondary/40 flex items-center gap-3">
         <Avatar hue={barber.avatarHue} name={barber.name} size={36} src={barber.photo} />
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-muted-foreground">Chatting with</p>
+          <p className="text-xs text-muted-foreground">{t("Chatting with")}</p>
           <p className="text-sm font-semibold truncate">{barber.designation} at {salon.name}</p>
         </div>
         <Link to="/book/$barberId" params={{ barberId: barber.id }}
           className="h-9 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-semibold flex items-center gap-1">
-          <Calendar className="h-3.5 w-3.5"/> Book
+          <Calendar className="h-3.5 w-3.5"/> {t("Book")}
         </Link>
       </div>
 
       <div ref={ref} className="px-4 py-4 space-y-2 overflow-y-auto" style={{ maxHeight: "calc(100vh - 280px)", minHeight: 360 }}>
-        <DayLabel label="Today" />
+        <DayLabel label={t("Today")} />
         {msgs.map((m) => <Bubble key={m.id} msg={m} barber={barber} />)}
         {typing && <TypingBubble barber={barber} />}
       </div>
@@ -89,7 +91,7 @@ function ChatPage() {
             <textarea
               value={text} onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-              placeholder="Type a message…"
+              placeholder={t("Type a message…")}
               rows={1}
               className="flex-1 bg-transparent outline-none text-sm resize-none max-h-24"
             />
