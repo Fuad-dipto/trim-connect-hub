@@ -11,7 +11,7 @@ export function LanguageToggle() {
   ];
   return (
     <div
-      className="fixed top-2 left-1/2 -translate-x-1/2 z-[60] pointer-events-none"
+      className="fixed top-2 right-2 z-[60] pointer-events-none"
       aria-label="Language switcher"
     >
       <div
