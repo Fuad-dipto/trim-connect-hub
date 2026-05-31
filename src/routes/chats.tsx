@@ -4,10 +4,12 @@ import { Avatar } from "@/components/brand";
 import { salons } from "@/lib/mock-data";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { useT } from "@/lib/i18n";
 
 export const Route = createFileRoute("/chats")({ component: Chats });
 
 function Chats() {
+  const { t } = useT();
   const conversations = salons.slice(0, 5).map((s, i) => ({
     salon: s,
     barber: s.barbers[0],
@@ -18,11 +20,11 @@ function Chats() {
 
   return (
     <MobileShell>
-      <PageHeader title="Messages" subtitle={`${conversations.length} conversations`} />
+      <PageHeader title={t("Messages")} subtitle={`${conversations.length} ${t("conversations")}`} />
       <div className="px-4 py-3">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
-          <Input placeholder="Search messages" className="pl-9 h-10 rounded-xl"/>
+          <Input placeholder={t("Search messages")} className="pl-9 h-10 rounded-xl"/>
         </div>
       </div>
       <ul className="divide-y divide-border">

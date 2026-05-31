@@ -4,12 +4,14 @@ import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
 import { ChevronRight, Heart, CreditCard, MapPin, Bell, HelpCircle, LogOut, Store, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 export const Route = createFileRoute("/profile")({ component: Profile });
 
 function Profile() {
   const [dark, setDark] = useState(false);
   const [favCount, setFavCount] = useState(4);
+  const { t } = useT();
 
   useEffect(() => {
     const stored = localStorage.getItem("tg.theme");
@@ -30,17 +32,17 @@ function Profile() {
   }
 
   const items: { icon: typeof Heart; label: string; toggle?: boolean; onClick?: () => void; active?: boolean }[] = [
-    { icon: Heart, label: "Favorite salons" },
-    { icon: CreditCard, label: "Payment methods" },
-    { icon: MapPin, label: "Saved addresses" },
-    { icon: Bell, label: "Notifications" },
-    { icon: Moon, label: "Dark mode", toggle: true, onClick: toggleDark, active: dark },
-    { icon: HelpCircle, label: "Help & support" },
+    { icon: Heart, label: t("Favorite salons") },
+    { icon: CreditCard, label: t("Payment methods") },
+    { icon: MapPin, label: t("Saved addresses") },
+    { icon: Bell, label: t("Notifications") },
+    { icon: Moon, label: t("Dark mode"), toggle: true, onClick: toggleDark, active: dark },
+    { icon: HelpCircle, label: t("Help & support") },
   ];
 
   return (
     <MobileShell>
-      <PageHeader title="Profile" />
+      <PageHeader title={t("Profile")} />
       <div className="px-4 py-4">
         <div className="rounded-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground p-4 flex items-center gap-3">
           <Avatar hue={285} name="Anika R" size={56}/>
@@ -48,11 +50,11 @@ function Profile() {
             <p className="font-bold">Anika Rahman</p>
             <p className="text-xs opacity-90">+880 1712 345 678</p>
           </div>
-          <button className="text-xs underline">Edit</button>
+          <button className="text-xs underline">{t("Edit")}</button>
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-2">
-          {[["12", "Bookings"], [String(favCount), "Favorites"], ["4.8", "Rating"]].map(([v, l]) => (
+          {[["12", t("Bookings")], [String(favCount), t("Favorites")], ["4.8", t("Rating")]].map(([v, l]) => (
             <div key={l} className="rounded-xl bg-card border border-border p-3 text-center">
               <p className="font-bold text-lg">{v}</p>
               <p className="text-[11px] text-muted-foreground">{l}</p>
@@ -63,8 +65,8 @@ function Profile() {
         <Link to="/owner" className="mt-4 block rounded-2xl border border-primary/30 bg-primary/5 p-4 flex items-center gap-3">
           <Store className="h-5 w-5 text-primary"/>
           <div className="flex-1">
-            <p className="font-semibold text-sm">Own a salon?</p>
-            <p className="text-xs text-muted-foreground">Switch to owner dashboard</p>
+            <p className="font-semibold text-sm">{t("Own a salon?")}</p>
+            <p className="text-xs text-muted-foreground">{t("Switch to owner dashboard")}</p>
           </div>
           <ChevronRight className="h-4 w-4 text-muted-foreground"/>
         </Link>
@@ -86,7 +88,7 @@ function Profile() {
         </ul>
 
         <button className="mt-4 w-full rounded-xl border border-border bg-card py-3 text-sm font-medium text-destructive flex items-center justify-center gap-2">
-          <LogOut className="h-4 w-4"/> Sign out
+          <LogOut className="h-4 w-4"/> {t("Sign out")}
         </button>
       </div>
     </MobileShell>
