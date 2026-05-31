@@ -6,6 +6,7 @@ import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 type Search = { next?: string };
 
@@ -19,6 +20,7 @@ function LoginPage() {
   const { next } = Route.useSearch();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [show, setShow] = useState(false);
+  const { t } = useT();
 
   function go() {
     if (next) window.location.assign(next);
@@ -27,29 +29,29 @@ function LoginPage() {
 
   return (
     <MobileShell>
-      <PageHeader title="Sign in" back={() => history.back()} />
+      <PageHeader title={t("Sign in")} back={() => history.back()} />
       <div className="px-5 py-4">
         <div className="text-center mb-6">
           <div className="flex justify-center mb-3"><Brand size="lg"/></div>
-          <h1 className="text-xl font-bold">{mode === "login" ? "Welcome back" : "Create your account"}</h1>
-          <p className="text-sm text-muted-foreground mt-1">Required to confirm and pay for your booking</p>
+          <h1 className="text-xl font-bold">{mode === "login" ? t("Welcome back") : t("Create your account")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t("Required to confirm and pay for your booking")}</p>
         </div>
 
         <button onClick={go} className="w-full h-12 rounded-xl border border-border bg-card flex items-center justify-center gap-3 font-medium hover:bg-secondary/50 transition">
-          <GoogleIcon /> Continue with Google
+          <GoogleIcon /> {t("Continue with Google")}
         </button>
 
         <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-          <div className="h-px flex-1 bg-border"/>or<div className="h-px flex-1 bg-border"/>
+          <div className="h-px flex-1 bg-border"/>{t("or")}<div className="h-px flex-1 bg-border"/>
         </div>
 
         <div className="space-y-3">
           {mode === "signup" && (
-            <Field label="Full name" placeholder="Your name" />
+            <Field label={t("Full name")} placeholder={t("Your name")} />
           )}
-          <Field label="Email" placeholder="you@example.com" icon={<Mail className="h-4 w-4"/>} type="email" />
+          <Field label={t("Email")} placeholder="you@example.com" icon={<Mail className="h-4 w-4"/>} type="email" />
           <div>
-            <label className="text-xs font-medium text-muted-foreground">Password</label>
+            <label className="text-xs font-medium text-muted-foreground">{t("Password")}</label>
             <div className="mt-1 relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
               <Input type={show ? "text" : "password"} placeholder="••••••••" className="pl-9 pr-9 h-11 rounded-xl"/>
@@ -61,13 +63,13 @@ function LoginPage() {
         </div>
 
         <Button onClick={go} className="w-full h-12 mt-4 rounded-xl font-semibold">
-          {mode === "login" ? "Sign in & continue" : "Create account & continue"}
+          {mode === "login" ? t("Sign in & continue") : t("Create account & continue")}
         </Button>
 
         <p className="text-center text-sm text-muted-foreground mt-4">
-          {mode === "login" ? "New here? " : "Already have an account? "}
+          {mode === "login" ? t("New here? ") : t("Already have an account? ")}
           <button onClick={() => setMode(mode === "login" ? "signup" : "login")} className="text-primary font-semibold">
-            {mode === "login" ? "Create account" : "Sign in"}
+            {mode === "login" ? t("Create account") : t("Sign in")}
           </button>
         </p>
       </div>

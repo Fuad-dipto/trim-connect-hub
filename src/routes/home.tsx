@@ -7,6 +7,7 @@ import { salons, type Salon } from "@/lib/mock-data";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 export const Route = createFileRoute("/home")({ component: Home });
 
@@ -30,6 +31,7 @@ function Home() {
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("nearest");
   const [view, setView] = useState<"list" | "map">("list");
+  const { t } = useT();
 
   const filtered = useMemo(() => {
     const f = quickFilters.find((x) => x.id === filter)!;
@@ -53,7 +55,7 @@ function Home() {
       <header className="px-4 pt-5 pb-3 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-b-3xl shadow-lg shadow-primary/20">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs flex items-center gap-1 opacity-90"><MapPin className="h-3 w-3"/> Current location</p>
+            <p className="text-xs flex items-center gap-1 opacity-90"><MapPin className="h-3 w-3"/> {t("Current location")}</p>
             <p className="font-semibold text-sm">Gulshan 2, Dhaka</p>
           </div>
           <button aria-label="Notifications" className="relative h-10 w-10 rounded-full bg-white/15 backdrop-blur flex items-center justify-center">
@@ -65,7 +67,7 @@ function Home() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             value={q} onChange={(e) => setQ(e.target.value)}
-            placeholder="Search salons, barbers, services"
+            placeholder={t("Search salons, barbers, services")}
             className="pl-9 h-11 rounded-xl bg-white text-foreground border-0 placeholder:text-muted-foreground"
           />
         </div>
@@ -73,9 +75,9 @@ function Home() {
 
       <div className="px-4 mt-5">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-sm">Browse by price</h2>
+          <h2 className="font-semibold text-sm">{t("Browse by price")}</h2>
           <button onClick={() => setView(view === "list" ? "map" : "list")} className="text-xs flex items-center gap-1 text-primary font-medium">
-            <Map className="h-3.5 w-3.5"/> {view === "list" ? "Map view" : "List view"}
+            <Map className="h-3.5 w-3.5"/> {view === "list" ? t("Map view") : t("List view")}
           </button>
         </div>
         <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
@@ -84,38 +86,38 @@ function Home() {
               className={cn("shrink-0 px-3 py-2 rounded-xl border text-xs font-medium text-left transition",
                 filter === f.id ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/30" : "bg-card border-border hover:border-primary/40"
               )}>
-              <div>{f.label}</div>
+              <div>{t(f.label)}</div>
               {f.sub && <div className="opacity-70 text-[10px] mt-0.5">{f.sub}</div>}
             </button>
           ))}
         </div>
 
         <div className="mt-4 flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-          <div className="shrink-0 flex items-center gap-1 text-xs text-muted-foreground"><SlidersHorizontal className="h-3.5 w-3.5"/>Sort</div>
+          <div className="shrink-0 flex items-center gap-1 text-xs text-muted-foreground"><SlidersHorizontal className="h-3.5 w-3.5"/>{t("Sort")}</div>
           {sortOptions.map((o) => (
             <button key={o.id} onClick={() => setSort(o.id)}
               className={cn("shrink-0 px-3 py-1 rounded-full text-xs border transition",
                 sort === o.id ? "bg-foreground text-background border-foreground" : "bg-card border-border text-muted-foreground")}>
-              {o.label}
+              {t(o.label)}
             </button>
           ))}
         </div>
       </div>
 
-      {view === "map" ? <MapView salons={filtered} /> : (
+      {view === "map" ? <MapView salons={filtered} t={t} /> : (
         <section className="px-4 mt-5 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Nearby salons</h2>
-            <span className="text-xs text-muted-foreground">{filtered.length} found</span>
+            <h2 className="font-semibold">{t("Nearby salons")}</h2>
+            <span className="text-xs text-muted-foreground">{filtered.length} {t("found")}</span>
           </div>
-          {filtered.map((s) => <SalonCard key={s.id} salon={s} />)}
+          {filtered.map((s) => <SalonCard key={s.id} salon={s} t={t} />)}
         </section>
       )}
     </MobileShell>
   );
 }
 
-function SalonCard({ salon }: { salon: Salon }) {
+function SalonCard({ salon, t }: { salon: Salon; t: (s: string) => string }) {
   return (
     <Link to="/salons/$id" params={{ id: salon.id }} className="block group">
       <div className="rounded-2xl bg-card border border-border overflow-hidden hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10 transition">
@@ -124,10 +126,10 @@ function SalonCard({ salon }: { salon: Salon }) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
           <div className="absolute top-2 left-2 flex gap-1">
             <Badge className={cn("text-[10px]", salon.isOpen ? "bg-emerald-500 hover:bg-emerald-500" : "bg-muted text-muted-foreground hover:bg-muted")}>
-              {salon.isOpen ? "Open now" : "Closed"}
+              {salon.isOpen ? t("Open now") : t("Closed")}
             </Badge>
             <Badge variant="secondary" className="text-[10px] bg-white/90 text-foreground">
-              <Users className="h-3 w-3 mr-1"/> {salon.crowd === "low" ? "No wait" : salon.crowd === "medium" ? "Few in queue" : "Busy"}
+              <Users className="h-3 w-3 mr-1"/> {salon.crowd === "low" ? t("No wait") : salon.crowd === "medium" ? t("Few in queue") : t("Busy queue")}
             </Badge>
           </div>
           <div className="absolute bottom-2 right-2 bg-black/40 backdrop-blur text-white text-[11px] px-2 py-0.5 rounded-full">
@@ -146,8 +148,8 @@ function SalonCard({ salon }: { salon: Salon }) {
             </div>
           </div>
           <div className="mt-2 flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">From <b className="text-foreground">{salon.priceMin}৳</b> · up to {salon.priceMax}৳</span>
-            <span className="text-xs font-semibold text-primary">Book →</span>
+            <span className="text-xs text-muted-foreground">{t("From")} <b className="text-foreground">{salon.priceMin}৳</b> · {t("up to")} {salon.priceMax}৳</span>
+            <span className="text-xs font-semibold text-primary">{t("Book →")}</span>
           </div>
         </div>
       </div>
@@ -155,7 +157,7 @@ function SalonCard({ salon }: { salon: Salon }) {
   );
 }
 
-function MapView({ salons }: { salons: Salon[] }) {
+function MapView({ salons, t }: { salons: Salon[]; t: (s: string) => string }) {
   return (
     <div className="mx-4 mt-5 rounded-2xl overflow-hidden border border-border relative h-[420px] bg-secondary">
       <div className="absolute inset-0"
@@ -183,7 +185,7 @@ function MapView({ salons }: { salons: Salon[] }) {
         );
       })}
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-card border border-border px-3 py-1 rounded-full text-[11px] shadow">
-        Showing {salons.length} salons near you
+        {t("Showing")} {salons.length} {t("salons near you")}
       </div>
     </div>
   );

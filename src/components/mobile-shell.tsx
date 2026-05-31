@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Calendar, MessageCircle, User, Store } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
 export function MobileShell({ children }: { children: React.ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
 
 function BottomNav() {
   const { location } = useRouterState();
+  const { t } = useT();
   const items = [
     { to: "/home", icon: Home, label: "Home" },
     { to: "/bookings", icon: Calendar, label: "Bookings" },
@@ -34,7 +36,7 @@ function BottomNav() {
                 active ? "text-primary" : "text-muted-foreground hover:text-foreground"
               )}>
                 <Icon className={cn("h-5 w-5", active && "drop-shadow-[0_0_8px_currentColor]")} />
-                {label}
+                {t(label)}
               </Link>
             </li>
           );
@@ -48,7 +50,7 @@ export function PageHeader({ title, subtitle, right, back }: {
   title: string; subtitle?: string; right?: React.ReactNode; back?: () => void;
 }) {
   return (
-    <header className="sticky top-0 z-30 bg-background/80 backdrop-blur border-b border-border px-4 py-3 flex items-center gap-3">
+    <header className="sticky top-0 z-30 bg-background/80 backdrop-blur border-b border-border px-4 py-3 pr-28 flex items-center gap-3">
       {back && (
         <button onClick={back} aria-label="Back" className="h-9 w-9 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/70">
           ←
