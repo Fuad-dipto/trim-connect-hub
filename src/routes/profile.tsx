@@ -5,6 +5,7 @@ import { Avatar } from "@/components/brand";
 import { ChevronRight, Heart, CreditCard, MapPin, Bell, HelpCircle, LogOut, Store, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
+import { useRole } from "@/lib/role";
 
 export const Route = createFileRoute("/profile")({ component: Profile });
 
@@ -12,6 +13,7 @@ function Profile() {
   const [dark, setDark] = useState(false);
   const [favCount, setFavCount] = useState(4);
   const { t } = useT();
+  const { role } = useRole();
 
   useEffect(() => {
     const stored = localStorage.getItem("tg.theme");
@@ -62,14 +64,16 @@ function Profile() {
           ))}
         </div>
 
-        <Link to="/owner" className="mt-4 block rounded-2xl border border-primary/30 bg-primary/5 p-4 flex items-center gap-3">
-          <Store className="h-5 w-5 text-primary"/>
-          <div className="flex-1">
-            <p className="font-semibold text-sm">{t("Own a salon?")}</p>
-            <p className="text-xs text-muted-foreground">{t("Switch to owner dashboard")}</p>
-          </div>
-          <ChevronRight className="h-4 w-4 text-muted-foreground"/>
-        </Link>
+        {role === "owner" && (
+          <Link to="/owner" className="mt-4 block rounded-2xl border border-primary/30 bg-primary/5 p-4 flex items-center gap-3">
+            <Store className="h-5 w-5 text-primary"/>
+            <div className="flex-1">
+              <p className="font-semibold text-sm">{t("Own a salon?")}</p>
+              <p className="text-xs text-muted-foreground">{t("Switch to owner dashboard")}</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground"/>
+          </Link>
+        )}
 
         <ul className="mt-4 rounded-2xl bg-card border border-border overflow-hidden">
           {items.map(({ icon: Icon, label, toggle, onClick, active }) => (

@@ -80,6 +80,13 @@ const bn: Record<string, string> = {
   "New here? ": "নতুন এখানে? ",
   "Already have an account? ": "ইতিমধ্যে একটি অ্যাকাউন্ট আছে? ",
   "Create account": "অ্যাকাউন্ট তৈরি",
+  "I am a": "আমি একজন",
+  "Salon Owner": "সেলুনের মালিক",
+  "Book salons & barbers": "সেলুন ও বার্বার বুক করুন",
+  "Manage my salon": "আমার সেলুন পরিচালনা",
+  "Customer View": "গ্রাহক ভিউ",
+  "Owner Dashboard": "মালিক ড্যাশবোর্ড",
+  "View mode": "ভিউ মোড",
 
   // ===== Home =====
   "Current location": "বর্তমান অবস্থান",
