@@ -1,12 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, User, Store } from "lucide-react";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
+import { useRole, type Role } from "@/lib/role";
 
 type Search = { next?: string };
 
@@ -21,10 +22,12 @@ function LoginPage() {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [show, setShow] = useState(false);
   const { t } = useT();
+  const { role, setRole } = useRole();
 
   function go() {
+    // If a `next` deep-link was provided, honor it. Otherwise route by role.
     if (next) window.location.assign(next);
-    else nav({ to: "/home" });
+    else nav({ to: role === "owner" ? "/owner" : "/home" });
   }
 
   return (
@@ -35,6 +38,38 @@ function LoginPage() {
           <div className="flex justify-center mb-3"><Brand size="lg"/></div>
           <h1 className="text-xl font-bold">{mode === "login" ? t("Welcome back") : t("Create your account")}</h1>
           <p className="text-sm text-muted-foreground mt-1">{t("Required to confirm and pay for your booking")}</p>
+        </div>
+
+        <div className="mb-5">
+          <p className="text-xs font-medium text-muted-foreground mb-2">{t("I am a")}</p>
+          <div className="grid grid-cols-2 gap-2">
+            {([
+              { id: "customer", label: t("Customer"), desc: t("Book salons & barbers"), icon: User },
+              { id: "owner", label: t("Salon Owner"), desc: t("Manage my salon"), icon: Store },
+            ] as { id: Role; label: string; desc: string; icon: typeof User }[]).map((o) => {
+              const active = role === o.id;
+              return (
+                <button
+                  key={o.id}
+                  type="button"
+                  onClick={() => setRole(o.id)}
+                  aria-pressed={active}
+                  className={cn(
+                    "rounded-xl border p-3 text-left transition",
+                    active
+                      ? "border-primary bg-primary/5 ring-2 ring-primary/30"
+                      : "border-border bg-card hover:bg-secondary/40",
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <o.icon className={cn("h-4 w-4", active ? "text-primary" : "text-muted-foreground")} />
+                    <span className="text-sm font-semibold">{o.label}</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-1">{o.desc}</p>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <button onClick={go} className="w-full h-12 rounded-xl border border-border bg-card flex items-center justify-center gap-3 font-medium hover:bg-secondary/50 transition">
