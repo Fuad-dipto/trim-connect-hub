@@ -14,6 +14,8 @@ import { LanguageProvider } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/language-toggle";
 import { RoleProvider } from "@/lib/role";
 import { RoleToggle } from "@/components/role-toggle";
+import { ThemeProvider } from "@/lib/theme";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 function NotFoundComponent() {
   return (
@@ -118,14 +120,17 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <RoleProvider>
-          <LanguageToggle />
-          <RoleToggle />
-          <Outlet />
-          <Toaster richColors position="top-center" />
-        </RoleProvider>
-      </LanguageProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          <RoleProvider>
+            <LanguageToggle />
+            <ThemeToggle />
+            <RoleToggle />
+            <Outlet />
+            <Toaster richColors position="top-center" />
+          </RoleProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

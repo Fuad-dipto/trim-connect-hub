@@ -6,39 +6,30 @@ import { ChevronRight, Heart, CreditCard, MapPin, Bell, HelpCircle, LogOut, Stor
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
 import { useRole } from "@/lib/role";
+import { useTheme } from "@/lib/theme";
 
 export const Route = createFileRoute("/profile")({ component: Profile });
 
 function Profile() {
-  const [dark, setDark] = useState(false);
   const [favCount, setFavCount] = useState(4);
   const { t } = useT();
   const { role } = useRole();
+  const { theme, toggle } = useTheme();
+  const dark = theme === "dark";
 
   useEffect(() => {
-    const stored = localStorage.getItem("tg.theme");
-    const isDark = stored ? stored === "dark" : document.documentElement.classList.contains("dark");
-    setDark(isDark);
-    document.documentElement.classList.toggle("dark", isDark);
     try {
       const favs: string[] = JSON.parse(localStorage.getItem("tg.favs") ?? "[]");
       setFavCount(favs.length);
     } catch { /* ignore */ }
   }, []);
 
-  function toggleDark() {
-    const next = !dark;
-    setDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("tg.theme", next ? "dark" : "light");
-  }
-
   const items: { icon: typeof Heart; label: string; toggle?: boolean; onClick?: () => void; active?: boolean }[] = [
     { icon: Heart, label: t("Favorite salons") },
     { icon: CreditCard, label: t("Payment methods") },
     { icon: MapPin, label: t("Saved addresses") },
     { icon: Bell, label: t("Notifications") },
-    { icon: Moon, label: t("Dark mode"), toggle: true, onClick: toggleDark, active: dark },
+    { icon: Moon, label: t("Dark mode"), toggle: true, onClick: toggle, active: dark },
     { icon: HelpCircle, label: t("Help & support") },
   ];
 
