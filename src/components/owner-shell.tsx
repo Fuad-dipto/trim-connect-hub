@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Scissors, CalendarDays, Settings, Bell,
