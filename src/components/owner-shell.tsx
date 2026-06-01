@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Scissors, CalendarDays, Settings, Bell,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
+import { useTheme } from "@/lib/theme";
 
 type NavItem = { to: string; icon: typeof LayoutDashboard; label: string; exact?: boolean };
 
@@ -18,7 +19,8 @@ export function OwnerShell({ title, subtitle, action, children }: {
   title: string; subtitle?: string; action?: React.ReactNode; children: React.ReactNode;
 }) {
   const { location } = useRouterState();
-  const [dark, setDark] = useState(false);
+  const { theme, toggle } = useTheme();
+  const dark = theme === "dark";
   const { t } = useT();
   const nav: NavItem[] = [
     { to: "/owner", icon: LayoutDashboard, label: t("Dashboard"), exact: true },
@@ -27,9 +29,6 @@ export function OwnerShell({ title, subtitle, action, children }: {
     { to: "/owner/bookings", icon: CalendarDays, label: t("Bookings") },
     { to: "/owner/settings", icon: Settings, label: t("Salon profile") },
   ];
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark);
-  }, [dark]);
 
   return (
     <div className="min-h-screen bg-secondary/40">
@@ -80,7 +79,7 @@ export function OwnerShell({ title, subtitle, action, children }: {
             <div className="flex items-center gap-2">
               {action}
               <button
-                onClick={() => setDark((d) => !d)}
+                onClick={toggle}
                 className="h-9 w-9 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/70"
                 aria-label={t("Toggle theme")}
               >
