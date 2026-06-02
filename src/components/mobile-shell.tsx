@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Calendar, MessageCircle, User, Store } from "lucide-react";
+import { Home, Calendar, MessageCircle, User, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
 
@@ -19,9 +19,9 @@ function BottomNav() {
   const { t } = useT();
   const items = [
     { to: "/home", icon: Home, label: "Home" },
+    { to: "/jobs", icon: Briefcase, label: "Jobs" },
     { to: "/bookings", icon: Calendar, label: "Bookings" },
     { to: "/chats", icon: MessageCircle, label: "Chats" },
-    { to: "/owner", icon: Store, label: "Owner" },
     { to: "/profile", icon: User, label: "Profile" },
   ];
   return (

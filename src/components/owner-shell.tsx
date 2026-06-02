@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Scissors, CalendarDays, Settings, Bell,
-  Search, Moon, Sun, LogOut, UserCircle2, ChevronDown,
+  Search, Moon, Sun, LogOut, UserCircle2, ChevronDown, Briefcase,
 } from "lucide-react";
 import { Brand, Avatar } from "@/components/brand";
 import {
@@ -26,6 +26,7 @@ export function OwnerShell({ title, subtitle, action, children }: {
     { to: "/owner/barbers", icon: Users, label: t("Employees") },
     { to: "/owner/services", icon: Scissors, label: t("Services") },
     { to: "/owner/bookings", icon: CalendarDays, label: t("Bookings") },
+    { to: "/owner/jobs", icon: Briefcase, label: t("Salon Jobs") },
     { to: "/owner/settings", icon: Settings, label: t("Salon profile") },
   ];
 
