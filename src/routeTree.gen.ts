@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as ChatsRouteImport } from './routes/chats'
 import { Route as BookingsRouteImport } from './routes/bookings'
@@ -21,8 +22,10 @@ import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as SalonsIdRouteImport } from './routes/salons.$id'
 import { Route as OwnerSettingsRouteImport } from './routes/owner.settings'
 import { Route as OwnerServicesRouteImport } from './routes/owner.services'
+import { Route as OwnerJobsRouteImport } from './routes/owner.jobs'
 import { Route as OwnerBookingsRouteImport } from './routes/owner.bookings'
 import { Route as OwnerBarbersRouteImport } from './routes/owner.barbers'
+import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as ChatBarberIdRouteImport } from './routes/chat.$barberId'
 import { Route as BookBarberIdRouteImport } from './routes/book.$barberId'
 
@@ -39,6 +42,11 @@ const PaymentRoute = PaymentRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsRoute = JobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HomeRoute = HomeRouteImport.update({
@@ -86,6 +94,11 @@ const OwnerServicesRoute = OwnerServicesRouteImport.update({
   path: '/owner/services',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OwnerJobsRoute = OwnerJobsRouteImport.update({
+  id: '/owner/jobs',
+  path: '/owner/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OwnerBookingsRoute = OwnerBookingsRouteImport.update({
   id: '/owner/bookings',
   path: '/owner/bookings',
@@ -95,6 +108,11 @@ const OwnerBarbersRoute = OwnerBarbersRouteImport.update({
   id: '/owner/barbers',
   path: '/owner/barbers',
   getParentRoute: () => rootRouteImport,
+} as any)
+const JobsIdRoute = JobsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => JobsRoute,
 } as any)
 const ChatBarberIdRoute = ChatBarberIdRouteImport.update({
   id: '/chat/$barberId',
@@ -113,13 +131,16 @@ export interface FileRoutesByFullPath {
   '/bookings': typeof BookingsRoute
   '/chats': typeof ChatsRoute
   '/home': typeof HomeRoute
+  '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
   '/payment': typeof PaymentRoute
   '/profile': typeof ProfileRoute
   '/book/$barberId': typeof BookBarberIdRoute
   '/chat/$barberId': typeof ChatBarberIdRoute
+  '/jobs/$id': typeof JobsIdRoute
   '/owner/barbers': typeof OwnerBarbersRoute
   '/owner/bookings': typeof OwnerBookingsRoute
+  '/owner/jobs': typeof OwnerJobsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/settings': typeof OwnerSettingsRoute
   '/salons/$id': typeof SalonsIdRoute
@@ -131,13 +152,16 @@ export interface FileRoutesByTo {
   '/bookings': typeof BookingsRoute
   '/chats': typeof ChatsRoute
   '/home': typeof HomeRoute
+  '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
   '/payment': typeof PaymentRoute
   '/profile': typeof ProfileRoute
   '/book/$barberId': typeof BookBarberIdRoute
   '/chat/$barberId': typeof ChatBarberIdRoute
+  '/jobs/$id': typeof JobsIdRoute
   '/owner/barbers': typeof OwnerBarbersRoute
   '/owner/bookings': typeof OwnerBookingsRoute
+  '/owner/jobs': typeof OwnerJobsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/settings': typeof OwnerSettingsRoute
   '/salons/$id': typeof SalonsIdRoute
@@ -150,13 +174,16 @@ export interface FileRoutesById {
   '/bookings': typeof BookingsRoute
   '/chats': typeof ChatsRoute
   '/home': typeof HomeRoute
+  '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
   '/payment': typeof PaymentRoute
   '/profile': typeof ProfileRoute
   '/book/$barberId': typeof BookBarberIdRoute
   '/chat/$barberId': typeof ChatBarberIdRoute
+  '/jobs/$id': typeof JobsIdRoute
   '/owner/barbers': typeof OwnerBarbersRoute
   '/owner/bookings': typeof OwnerBookingsRoute
+  '/owner/jobs': typeof OwnerJobsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/settings': typeof OwnerSettingsRoute
   '/salons/$id': typeof SalonsIdRoute
@@ -170,13 +197,16 @@ export interface FileRouteTypes {
     | '/bookings'
     | '/chats'
     | '/home'
+    | '/jobs'
     | '/login'
     | '/payment'
     | '/profile'
     | '/book/$barberId'
     | '/chat/$barberId'
+    | '/jobs/$id'
     | '/owner/barbers'
     | '/owner/bookings'
+    | '/owner/jobs'
     | '/owner/services'
     | '/owner/settings'
     | '/salons/$id'
@@ -188,13 +218,16 @@ export interface FileRouteTypes {
     | '/bookings'
     | '/chats'
     | '/home'
+    | '/jobs'
     | '/login'
     | '/payment'
     | '/profile'
     | '/book/$barberId'
     | '/chat/$barberId'
+    | '/jobs/$id'
     | '/owner/barbers'
     | '/owner/bookings'
+    | '/owner/jobs'
     | '/owner/services'
     | '/owner/settings'
     | '/salons/$id'
@@ -206,13 +239,16 @@ export interface FileRouteTypes {
     | '/bookings'
     | '/chats'
     | '/home'
+    | '/jobs'
     | '/login'
     | '/payment'
     | '/profile'
     | '/book/$barberId'
     | '/chat/$barberId'
+    | '/jobs/$id'
     | '/owner/barbers'
     | '/owner/bookings'
+    | '/owner/jobs'
     | '/owner/services'
     | '/owner/settings'
     | '/salons/$id'
@@ -225,6 +261,7 @@ export interface RootRouteChildren {
   BookingsRoute: typeof BookingsRoute
   ChatsRoute: typeof ChatsRoute
   HomeRoute: typeof HomeRoute
+  JobsRoute: typeof JobsRouteWithChildren
   LoginRoute: typeof LoginRoute
   PaymentRoute: typeof PaymentRoute
   ProfileRoute: typeof ProfileRoute
@@ -232,6 +269,7 @@ export interface RootRouteChildren {
   ChatBarberIdRoute: typeof ChatBarberIdRoute
   OwnerBarbersRoute: typeof OwnerBarbersRoute
   OwnerBookingsRoute: typeof OwnerBookingsRoute
+  OwnerJobsRoute: typeof OwnerJobsRoute
   OwnerServicesRoute: typeof OwnerServicesRoute
   OwnerSettingsRoute: typeof OwnerSettingsRoute
   SalonsIdRoute: typeof SalonsIdRoute
@@ -259,6 +297,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs': {
+      id: '/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof JobsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/home': {
@@ -324,6 +369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/owner/jobs': {
+      id: '/owner/jobs'
+      path: '/owner/jobs'
+      fullPath: '/owner/jobs'
+      preLoaderRoute: typeof OwnerJobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/owner/bookings': {
       id: '/owner/bookings'
       path: '/owner/bookings'
@@ -337,6 +389,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/owner/barbers'
       preLoaderRoute: typeof OwnerBarbersRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/jobs/$id': {
+      id: '/jobs/$id'
+      path: '/$id'
+      fullPath: '/jobs/$id'
+      preLoaderRoute: typeof JobsIdRouteImport
+      parentRoute: typeof JobsRoute
     }
     '/chat/$barberId': {
       id: '/chat/$barberId'
@@ -355,12 +414,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface JobsRouteChildren {
+  JobsIdRoute: typeof JobsIdRoute
+}
+
+const JobsRouteChildren: JobsRouteChildren = {
+  JobsIdRoute: JobsIdRoute,
+}
+
+const JobsRouteWithChildren = JobsRoute._addFileChildren(JobsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BookingSuccessRoute: BookingSuccessRoute,
   BookingsRoute: BookingsRoute,
   ChatsRoute: ChatsRoute,
   HomeRoute: HomeRoute,
+  JobsRoute: JobsRouteWithChildren,
   LoginRoute: LoginRoute,
   PaymentRoute: PaymentRoute,
   ProfileRoute: ProfileRoute,
@@ -368,6 +438,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatBarberIdRoute: ChatBarberIdRoute,
   OwnerBarbersRoute: OwnerBarbersRoute,
   OwnerBookingsRoute: OwnerBookingsRoute,
+  OwnerJobsRoute: OwnerJobsRoute,
   OwnerServicesRoute: OwnerServicesRoute,
   OwnerSettingsRoute: OwnerSettingsRoute,
   SalonsIdRoute: SalonsIdRoute,
