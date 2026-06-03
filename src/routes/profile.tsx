@@ -2,10 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
-import { ChevronRight, Heart, CreditCard, MapPin, Bell, HelpCircle, LogOut, Store, Moon } from "lucide-react";
+import { ChevronRight, Heart, CreditCard, MapPin, Bell, HelpCircle, LogOut, Store, Moon, Calendar, Settings as SettingsIcon, ArrowRight, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
-import { useRole } from "@/lib/role";
 import { useTheme } from "@/lib/theme";
 
 export const Route = createFileRoute("/profile")({ component: Profile });
@@ -13,7 +12,6 @@ export const Route = createFileRoute("/profile")({ component: Profile });
 function Profile() {
   const [favCount, setFavCount] = useState(4);
   const { t } = useT();
-  const { role } = useRole();
   const { theme, toggle } = useTheme();
   const dark = theme === "dark";
 
@@ -25,10 +23,11 @@ function Profile() {
   }, []);
 
   const items: { icon: typeof Heart; label: string; toggle?: boolean; onClick?: () => void; active?: boolean }[] = [
-    { icon: Heart, label: t("Favorite salons") },
-    { icon: CreditCard, label: t("Payment methods") },
-    { icon: MapPin, label: t("Saved addresses") },
+    { icon: Calendar, label: t("My Bookings") },
+    { icon: CreditCard, label: t("Payment History") },
+    { icon: Heart, label: t("Saved Salons") },
     { icon: Bell, label: t("Notifications") },
+    { icon: SettingsIcon, label: t("Settings") },
     { icon: Moon, label: t("Dark mode"), toggle: true, onClick: toggle, active: dark },
     { icon: HelpCircle, label: t("Help & support") },
   ];
@@ -55,16 +54,25 @@ function Profile() {
           ))}
         </div>
 
-        {role === "owner" && (
-          <Link to="/owner" className="mt-4 block rounded-2xl border border-primary/30 bg-primary/5 p-4 flex items-center gap-3">
-            <Store className="h-5 w-5 text-primary"/>
-            <div className="flex-1">
-              <p className="font-semibold text-sm">{t("Own a salon?")}</p>
-              <p className="text-xs text-muted-foreground">{t("Switch to owner dashboard")}</p>
+        <Link
+          to="/owner-portal"
+          className="mt-4 block rounded-2xl bg-gradient-to-br from-foreground via-foreground to-foreground/85 text-background p-4 shadow-lg relative overflow-hidden"
+        >
+          <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-accent/30 blur-2xl"/>
+          <div className="relative flex items-center gap-3">
+            <div className="h-11 w-11 rounded-xl bg-background/15 backdrop-blur flex items-center justify-center">
+              <Store className="h-5 w-5"/>
             </div>
-            <ChevronRight className="h-4 w-4 text-muted-foreground"/>
-          </Link>
-        )}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5">
+                <p className="font-semibold text-sm">{t("Owner Portal")}</p>
+                <ShieldCheck className="h-3.5 w-3.5 opacity-80"/>
+              </div>
+              <p className="text-[11px] opacity-80">{t("Manage bookings, staff, services & revenue")}</p>
+            </div>
+            <ArrowRight className="h-4 w-4"/>
+          </div>
+        </Link>
 
         <ul className="mt-4 rounded-2xl bg-card border border-border overflow-hidden">
           {items.map(({ icon: Icon, label, toggle, onClick, active }) => (
