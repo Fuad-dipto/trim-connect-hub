@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PaymentRouteImport } from './routes/payment'
+import { Route as OwnerRegisterRouteImport } from './routes/owner-register'
+import { Route as OwnerPortalRouteImport } from './routes/owner-portal'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as HomeRouteImport } from './routes/home'
@@ -37,6 +39,16 @@ const ProfileRoute = ProfileRouteImport.update({
 const PaymentRoute = PaymentRouteImport.update({
   id: '/payment',
   path: '/payment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OwnerRegisterRoute = OwnerRegisterRouteImport.update({
+  id: '/owner-register',
+  path: '/owner-register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OwnerPortalRoute = OwnerPortalRouteImport.update({
+  id: '/owner-portal',
+  path: '/owner-portal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -133,6 +145,8 @@ export interface FileRoutesByFullPath {
   '/home': typeof HomeRoute
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
+  '/owner-portal': typeof OwnerPortalRoute
+  '/owner-register': typeof OwnerRegisterRoute
   '/payment': typeof PaymentRoute
   '/profile': typeof ProfileRoute
   '/book/$barberId': typeof BookBarberIdRoute
@@ -154,6 +168,8 @@ export interface FileRoutesByTo {
   '/home': typeof HomeRoute
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
+  '/owner-portal': typeof OwnerPortalRoute
+  '/owner-register': typeof OwnerRegisterRoute
   '/payment': typeof PaymentRoute
   '/profile': typeof ProfileRoute
   '/book/$barberId': typeof BookBarberIdRoute
@@ -176,6 +192,8 @@ export interface FileRoutesById {
   '/home': typeof HomeRoute
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
+  '/owner-portal': typeof OwnerPortalRoute
+  '/owner-register': typeof OwnerRegisterRoute
   '/payment': typeof PaymentRoute
   '/profile': typeof ProfileRoute
   '/book/$barberId': typeof BookBarberIdRoute
@@ -199,6 +217,8 @@ export interface FileRouteTypes {
     | '/home'
     | '/jobs'
     | '/login'
+    | '/owner-portal'
+    | '/owner-register'
     | '/payment'
     | '/profile'
     | '/book/$barberId'
@@ -220,6 +240,8 @@ export interface FileRouteTypes {
     | '/home'
     | '/jobs'
     | '/login'
+    | '/owner-portal'
+    | '/owner-register'
     | '/payment'
     | '/profile'
     | '/book/$barberId'
@@ -241,6 +263,8 @@ export interface FileRouteTypes {
     | '/home'
     | '/jobs'
     | '/login'
+    | '/owner-portal'
+    | '/owner-register'
     | '/payment'
     | '/profile'
     | '/book/$barberId'
@@ -263,6 +287,8 @@ export interface RootRouteChildren {
   HomeRoute: typeof HomeRoute
   JobsRoute: typeof JobsRouteWithChildren
   LoginRoute: typeof LoginRoute
+  OwnerPortalRoute: typeof OwnerPortalRoute
+  OwnerRegisterRoute: typeof OwnerRegisterRoute
   PaymentRoute: typeof PaymentRoute
   ProfileRoute: typeof ProfileRoute
   BookBarberIdRoute: typeof BookBarberIdRoute
@@ -290,6 +316,20 @@ declare module '@tanstack/react-router' {
       path: '/payment'
       fullPath: '/payment'
       preLoaderRoute: typeof PaymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner-register': {
+      id: '/owner-register'
+      path: '/owner-register'
+      fullPath: '/owner-register'
+      preLoaderRoute: typeof OwnerRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner-portal': {
+      id: '/owner-portal'
+      path: '/owner-portal'
+      fullPath: '/owner-portal'
+      preLoaderRoute: typeof OwnerPortalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -432,6 +472,8 @@ const rootRouteChildren: RootRouteChildren = {
   HomeRoute: HomeRoute,
   JobsRoute: JobsRouteWithChildren,
   LoginRoute: LoginRoute,
+  OwnerPortalRoute: OwnerPortalRoute,
+  OwnerRegisterRoute: OwnerRegisterRoute,
   PaymentRoute: PaymentRoute,
   ProfileRoute: ProfileRoute,
   BookBarberIdRoute: BookBarberIdRoute,
@@ -447,13 +489,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
