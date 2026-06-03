@@ -47,7 +47,7 @@ function OwnerRegister() {
   };
 
   const submit = () => {
-    ownerAccountActions.register(f);
+    ownerAccountActions.register({ ...f, passwordHash: f.password });
     toast.success("Salon registered!", { description: "Welcome to your Owner Dashboard." });
     nav({ to: "/owner" });
   };
