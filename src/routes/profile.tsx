@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
-import { ChevronRight, Heart, CreditCard, MapPin, Bell, HelpCircle, LogOut, Store, Moon, Calendar, Settings as SettingsIcon, ArrowRight, ShieldCheck } from "lucide-react";
+import { ChevronRight, Heart, CreditCard, Bell, HelpCircle, LogOut, Store, Moon, Calendar, Settings as SettingsIcon, ArrowRight, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
