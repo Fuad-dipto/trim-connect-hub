@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { TrendingUp, Users, Calendar, DollarSign, Star, Plus, Scissors, MessageSquare } from "lucide-react";
+import { TrendingUp, Users, Calendar, DollarSign, Star, Plus, Scissors, MessageSquare, Briefcase, Clock, Wallet } from "lucide-react";
 import { OwnerShell } from "@/components/owner-shell";
 import { Avatar } from "@/components/brand";
 import { ownerStats, recentBookings, earningsTrend, salons } from "@/lib/mock-data";
 import { useOwnerStore } from "@/lib/owner-store";
+import { useJobsStore } from "@/lib/jobs-store";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -13,9 +14,14 @@ function Dashboard() {
   const employees = useOwnerStore((s) => s.employees);
   const services = useOwnerStore((s) => s.services);
   const profile = useOwnerStore((s) => s.profile);
+  const jobs = useJobsStore((s) => s.jobs);
+  const apps = useJobsStore((s) => s.apps);
   const activeCount = employees.filter((e) => e.status !== "offline").length;
   const reviews = salons[0].reviews;
   const avgRating = (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1);
+  const monthRevenue = earningsTrend.reduce((a, b) => a + b.value, 0) * 4;
+  const pending = recentBookings.filter((b) => b.status === "pending").length;
+  const totalBookings = 1284;
   const dist = [5, 4, 3, 2, 1].map((s) => ({
     star: s,
     count: reviews.filter((r) => r.rating === s).length,
@@ -36,8 +42,12 @@ function Dashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <KPI icon={<DollarSign className="h-4 w-4"/>} label="Today's earnings" value={`${ownerStats.todayEarnings.toLocaleString()}৳`} trend="+12.4%" tone="primary"/>
         <KPI icon={<Calendar className="h-4 w-4"/>} label="Today's bookings" value={ownerStats.todayBookings} trend="+5"/>
-        <KPI icon={<Users className="h-4 w-4"/>} label="Active employees" value={`${activeCount} / ${employees.length}`} trend={`${services.length} services`}/>
-        <KPI icon={<Star className="h-4 w-4"/>} label="Avg rating" value={ownerStats.rating} trend="+0.1 this wk"/>
+        <KPI icon={<Wallet className="h-4 w-4"/>} label="Monthly revenue" value={`${(monthRevenue/1000).toFixed(1)}k৳`} trend="+8.2%"/>
+        <KPI icon={<Calendar className="h-4 w-4"/>} label="Total bookings" value={totalBookings.toLocaleString()} trend="All time"/>
+        <KPI icon={<Users className="h-4 w-4"/>} label="Active barbers" value={`${activeCount} / ${employees.length}`} trend={`${services.length} services`}/>
+        <KPI icon={<Star className="h-4 w-4"/>} label="Customer reviews" value={`${avgRating} ★`} trend={`${total} this mo`}/>
+        <KPI icon={<Clock className="h-4 w-4"/>} label="Pending appts" value={pending} trend="Needs action"/>
+        <KPI icon={<Briefcase className="h-4 w-4"/>} label="Job applications" value={apps.length} trend={`${jobs.filter(j => j.status === "active").length} active jobs`}/>
       </div>
 
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
