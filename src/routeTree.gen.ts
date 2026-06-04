@@ -17,6 +17,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as ChatsRouteImport } from './routes/chats'
+import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as BookingsRouteImport } from './routes/bookings'
 import { Route as BookingSuccessRouteImport } from './routes/booking-success'
 import { Route as IndexRouteImport } from './routes/index'
@@ -69,6 +70,11 @@ const HomeRoute = HomeRouteImport.update({
 const ChatsRoute = ChatsRouteImport.update({
   id: '/chats',
   path: '/chats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesRoute = CategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookingsRoute = BookingsRouteImport.update({
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/booking-success': typeof BookingSuccessRoute
   '/bookings': typeof BookingsRoute
+  '/categories': typeof CategoriesRoute
   '/chats': typeof ChatsRoute
   '/home': typeof HomeRoute
   '/jobs': typeof JobsRouteWithChildren
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/booking-success': typeof BookingSuccessRoute
   '/bookings': typeof BookingsRoute
+  '/categories': typeof CategoriesRoute
   '/chats': typeof ChatsRoute
   '/home': typeof HomeRoute
   '/jobs': typeof JobsRouteWithChildren
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/booking-success': typeof BookingSuccessRoute
   '/bookings': typeof BookingsRoute
+  '/categories': typeof CategoriesRoute
   '/chats': typeof ChatsRoute
   '/home': typeof HomeRoute
   '/jobs': typeof JobsRouteWithChildren
@@ -213,6 +222,7 @@ export interface FileRouteTypes {
     | '/'
     | '/booking-success'
     | '/bookings'
+    | '/categories'
     | '/chats'
     | '/home'
     | '/jobs'
@@ -236,6 +246,7 @@ export interface FileRouteTypes {
     | '/'
     | '/booking-success'
     | '/bookings'
+    | '/categories'
     | '/chats'
     | '/home'
     | '/jobs'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/'
     | '/booking-success'
     | '/bookings'
+    | '/categories'
     | '/chats'
     | '/home'
     | '/jobs'
@@ -283,6 +295,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BookingSuccessRoute: typeof BookingSuccessRoute
   BookingsRoute: typeof BookingsRoute
+  CategoriesRoute: typeof CategoriesRoute
   ChatsRoute: typeof ChatsRoute
   HomeRoute: typeof HomeRoute
   JobsRoute: typeof JobsRouteWithChildren
@@ -358,6 +371,13 @@ declare module '@tanstack/react-router' {
       path: '/chats'
       fullPath: '/chats'
       preLoaderRoute: typeof ChatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories': {
+      id: '/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bookings': {
@@ -468,6 +488,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BookingSuccessRoute: BookingSuccessRoute,
   BookingsRoute: BookingsRoute,
+  CategoriesRoute: CategoriesRoute,
   ChatsRoute: ChatsRoute,
   HomeRoute: HomeRoute,
   JobsRoute: JobsRouteWithChildren,

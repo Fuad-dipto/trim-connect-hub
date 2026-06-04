@@ -4,6 +4,7 @@ import { MapPin, Navigation, ShieldCheck, Sparkles } from "lucide-react";
 import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n";
+import { useCategory } from "@/lib/category";
 
 export const Route = createFileRoute("/")({
   component: Splash,
@@ -13,10 +14,11 @@ function Splash() {
   const nav = useNavigate();
   const [stage, setStage] = useState<"intro" | "locating">("intro");
   const { t } = useT();
+  const category = useCategory();
 
   function allow() {
     setStage("locating");
-    setTimeout(() => nav({ to: "/home" }), 1400);
+    setTimeout(() => nav({ to: category ? "/home" : "/categories" }), 1400);
   }
 
   return (
@@ -47,7 +49,7 @@ function Splash() {
                 <Button onClick={allow} className="w-full h-12 rounded-xl bg-white text-primary hover:bg-white/90 font-semibold">
                   {t("Allow location access")}
                 </Button>
-                <button onClick={() => nav({ to: "/home" })} className="w-full h-10 text-sm text-white/80 hover:text-white">
+                <button onClick={() => nav({ to: category ? "/home" : "/categories" })} className="w-full h-10 text-sm text-white/80 hover:text-white">
                   {t("Not now")}
                 </button>
               </div>
