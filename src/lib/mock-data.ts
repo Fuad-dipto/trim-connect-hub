@@ -19,7 +19,7 @@ export type Service = {
   price: number; // taka
 };
 
-export type Salon = {
+export type Salon = ProviderExtras & {
   id: string;
   name: string;
   area: string;
