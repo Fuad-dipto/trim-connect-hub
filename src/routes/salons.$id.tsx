@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
-import { MapPin, Star, Clock, Phone, MessageCircle, Users, ChevronRight, Navigation, ChevronDown, Heart, Share2 } from "lucide-react";
+import { MapPin, Star, Clock, Phone, MessageCircle, Users, ChevronRight, Navigation, ChevronDown, Heart, Share2, Truck, Image as ImageIcon, Package } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
@@ -108,6 +108,25 @@ function SalonDetails() {
 
         <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{salon.description}</p>
 
+        {salon.category === "home" && (salon.travelCharge !== undefined || salon.coverageArea) && (
+          <div className="mt-4 rounded-2xl border border-border bg-card p-3 grid grid-cols-2 gap-3">
+            <div className="flex items-start gap-2">
+              <Truck className="h-4 w-4 text-primary mt-0.5"/>
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{t("Travel charge")}</p>
+                <p className="text-sm font-semibold">{salon.travelCharge ?? 0}৳</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <MapPin className="h-4 w-4 text-primary mt-0.5"/>
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{t("Coverage")}</p>
+                <p className="text-sm font-semibold leading-tight">{salon.coverageArea ?? salon.area}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="mt-4 flex gap-2">
           <a href={`tel:${salon.phone}`} className="flex-1">
             <Button variant="outline" className="w-full rounded-xl"><Phone className="h-4 w-4 mr-1"/>{t("Call")}</Button>
@@ -116,6 +135,34 @@ function SalonDetails() {
             <Button variant="outline" className="w-full rounded-xl"><Navigation className="h-4 w-4 mr-1"/>{t("Directions")}</Button>
           </a>
         </div>
+
+        {salon.portfolio && salon.portfolio.length > 0 && (
+          <section className="mt-6">
+            <h2 className="font-semibold mb-3 flex items-center gap-2"><ImageIcon className="h-4 w-4"/> {t("Portfolio")}</h2>
+            <div className="grid grid-cols-3 gap-2">
+              {salon.portfolio.map((p, i) => (
+                <img key={i} src={p} alt="" loading="lazy" className="aspect-square w-full object-cover rounded-xl border border-border"/>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {salon.packages && salon.packages.length > 0 && (
+          <section className="mt-6">
+            <h2 className="font-semibold mb-3 flex items-center gap-2"><Package className="h-4 w-4"/> {t("Packages")}</h2>
+            <div className="space-y-2">
+              {salon.packages.map((pkg) => (
+                <div key={pkg.id} className="rounded-2xl border border-border bg-card p-3 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold">{pkg.name}</p>
+                    <p className="text-xs text-muted-foreground leading-snug">{pkg.includes}</p>
+                  </div>
+                  <p className="font-bold text-sm shrink-0">{pkg.price.toLocaleString()}৳</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="mt-6">
           <h2 className="font-semibold mb-3">{t("Our team")} ({salon.barbers.length})</h2>
