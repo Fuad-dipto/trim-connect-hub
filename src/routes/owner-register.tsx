@@ -18,7 +18,13 @@ type Form = {
   address: string; mapLocation: string; hours: string;
 };
 
-const CATEGORIES = ["Unisex Salon", "Men's Barber", "Women's Salon", "Beauty Parlor", "Spa & Wellness", "Nail Studio"];
+const CATEGORIES = [
+  "Male Grooming",
+  "Female Beauty & Parlour",
+  "Home Services",
+  "Bridal Services",
+  "Wedding & Event",
+];
 const STEPS = [
   { id: 1, label: "Owner", icon: ShieldCheck },
   { id: 2, label: "Salon", icon: Store },
