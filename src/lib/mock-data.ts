@@ -124,6 +124,7 @@ const sampleReviews = (seed: number): Review[] => [
 export const salons: Salon[] = [
   {
     id: "luxe-cuts",
+    category: "male",
     name: "Luxe Cuts Studio",
     area: "Gulshan 2",
     distance: 0.8,
@@ -154,6 +155,7 @@ export const salons: Salon[] = [
   },
   {
     id: "barber-bros",
+    category: "male",
     name: "Barber Bros",
     area: "Banani",
     distance: 1.4,
@@ -183,6 +185,7 @@ export const salons: Salon[] = [
   },
   {
     id: "quick-trim",
+    category: "male",
     name: "QuickTrim Express",
     area: "Dhanmondi 27",
     distance: 2.1,
@@ -212,6 +215,7 @@ export const salons: Salon[] = [
   },
   {
     id: "glamour-house",
+    category: "female",
     name: "Glamour House",
     area: "Bashundhara R/A",
     distance: 3.0,
@@ -241,6 +245,7 @@ export const salons: Salon[] = [
   },
   {
     id: "urban-edge",
+    category: "male",
     name: "Urban Edge Barbers",
     area: "Uttara Sec 4",
     distance: 4.2,
@@ -270,6 +275,7 @@ export const salons: Salon[] = [
   },
   {
     id: "rose-petal",
+    category: "female",
     name: "Rose Petal Salon",
     area: "Mirpur DOHS",
     distance: 5.5,
