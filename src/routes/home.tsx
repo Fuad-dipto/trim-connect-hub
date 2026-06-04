@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { MapPin, Search, SlidersHorizontal, Star, Users, Bell, Map } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { MapPin, Search, SlidersHorizontal, Star, Users, Bell, Map, ArrowLeftRight, Home as HomeIcon, Image as ImageIcon } from "lucide-react";
 import { MobileShell, PageHeader } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
 import { salons, type Salon } from "@/lib/mock-data";
@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
+import { getCategoryMeta, useCategory } from "@/lib/category";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/home")({ component: Home });
 
@@ -32,11 +34,20 @@ function Home() {
   const [sort, setSort] = useState("nearest");
   const [view, setView] = useState<"list" | "map">("list");
   const { t } = useT();
+  const category = useCategory();
+  const nav = useNavigate();
+
+  useEffect(() => {
+    if (!category) nav({ to: "/categories", replace: true });
+  }, [category, nav]);
+
+  const meta = category ? getCategoryMeta(category) : null;
 
   const filtered = useMemo(() => {
     const f = quickFilters.find((x) => x.id === filter)!;
     const [lo, hi] = f.range;
     let r = salons.filter((s) =>
+      (!category || s.category === category) &&
       s.priceMin <= hi && s.priceMax >= lo &&
       (q.trim() === "" || (s.name + s.area).toLowerCase().includes(q.toLowerCase()))
     );
@@ -48,7 +59,9 @@ function Home() {
       return b.reviewCount - a.reviewCount;
     });
     return r;
-  }, [q, filter, sort]);
+  }, [q, filter, sort, category]);
+
+  const CatIcon = meta?.icon;
 
   return (
     <MobileShell>
@@ -63,6 +76,21 @@ function Home() {
             <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-accent" />
           </button>
         </div>
+        {meta && CatIcon && (
+          <button
+            onClick={() => nav({ to: "/categories" })}
+            className="mt-3 w-full rounded-2xl bg-white/15 backdrop-blur border border-white/20 px-3 py-2 flex items-center gap-3 text-left hover:bg-white/20 transition"
+          >
+            <div className="h-9 w-9 rounded-xl bg-white/20 flex items-center justify-center">
+              <CatIcon className="h-4 w-4" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] uppercase tracking-wide opacity-80">{t("Browsing")}</p>
+              <p className="text-sm font-semibold truncate">{t(meta.label)}</p>
+            </div>
+            <span className="text-[11px] flex items-center gap-1 opacity-90"><ArrowLeftRight className="h-3 w-3"/> {t("Switch")}</span>
+          </button>
+        )}
         <div className="mt-4 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -107,10 +135,15 @@ function Home() {
       {view === "map" ? <MapView salons={filtered} t={t} /> : (
         <section className="px-4 mt-5 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold">{t("Nearby salons")}</h2>
+            <h2 className="font-semibold">{meta ? t(meta.label) : t("Nearby salons")}</h2>
             <span className="text-xs text-muted-foreground">{filtered.length} {t("found")}</span>
           </div>
           {filtered.map((s) => <SalonCard key={s.id} salon={s} t={t} />)}
+          {filtered.length === 0 && (
+            <div className="text-center py-10 text-sm text-muted-foreground">
+              {t("No providers match these filters yet.")}
+            </div>
+          )}
         </section>
       )}
     </MobileShell>
@@ -128,12 +161,22 @@ function SalonCard({ salon, t }: { salon: Salon; t: (s: string) => string }) {
             <Badge className={cn("text-[10px]", salon.isOpen ? "bg-emerald-500 hover:bg-emerald-500" : "bg-muted text-muted-foreground hover:bg-muted")}>
               {salon.isOpen ? t("Open now") : t("Closed")}
             </Badge>
-            <Badge variant="secondary" className="text-[10px] bg-white/90 text-foreground">
-              <Users className="h-3 w-3 mr-1"/> {salon.crowd === "low" ? t("No wait") : salon.crowd === "medium" ? t("Few in queue") : t("Busy queue")}
-            </Badge>
+            {salon.category === "home" ? (
+              <Badge variant="secondary" className="text-[10px] bg-white/90 text-foreground">
+                <HomeIcon className="h-3 w-3 mr-1"/> {t("Visits home")}
+              </Badge>
+            ) : (salon.category === "bridal" || salon.category === "wedding") ? (
+              <Badge variant="secondary" className="text-[10px] bg-white/90 text-foreground">
+                <ImageIcon className="h-3 w-3 mr-1"/> {t("Portfolio")}
+              </Badge>
+            ) : (
+              <Badge variant="secondary" className="text-[10px] bg-white/90 text-foreground">
+                <Users className="h-3 w-3 mr-1"/> {salon.crowd === "low" ? t("No wait") : salon.crowd === "medium" ? t("Few in queue") : t("Busy queue")}
+              </Badge>
+            )}
           </div>
           <div className="absolute bottom-2 right-2 bg-black/40 backdrop-blur text-white text-[11px] px-2 py-0.5 rounded-full">
-            {salon.distance} km
+            {salon.category === "home" ? t("On-demand") : `${salon.distance} km`}
           </div>
         </div>
         <div className="p-3">
@@ -148,7 +191,10 @@ function SalonCard({ salon, t }: { salon: Salon; t: (s: string) => string }) {
             </div>
           </div>
           <div className="mt-2 flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">{t("From")} <b className="text-foreground">{salon.priceMin}৳</b> · {t("up to")} {salon.priceMax}৳</span>
+            <span className="text-xs text-muted-foreground">
+              {t("From")} <b className="text-foreground">{salon.priceMin}৳</b>
+              {salon.travelCharge ? <> · {t("travel")} {salon.travelCharge}৳</> : <> · {t("up to")} {salon.priceMax}৳</>}
+            </span>
             <span className="text-xs font-semibold text-primary">{t("Book →")}</span>
           </div>
         </div>
