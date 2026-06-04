@@ -55,6 +55,16 @@ export type Review = {
   text: string;
 };
 
+export type Category = "male" | "female" | "home" | "bridal" | "wedding";
+
+export type ProviderExtras = {
+  category: Category;
+  travelCharge?: number;       // BDT, for home services
+  coverageArea?: string;       // for home services
+  portfolio?: string[];        // for bridal / wedding
+  packages?: { id: string; name: string; price: number; includes: string }[];
+};
+
 const svc = (id: string, name: string, description: string, duration: number, price: number): Service => ({
   id, name, description, duration, price,
 });
