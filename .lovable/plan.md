@@ -1,45 +1,95 @@
-## Trimgo — Customer-first Entry + Owner Portal Gating
+# TrimGo Marketplace Expansion Plan
 
-### 1. Remove role toggle from app shell
-- Delete `RoleToggle` usage in `src/routes/__root.tsx` (keep `RoleProvider` for state; remove the floating toggle component from layout).
-- Remove the Customer/Owner picker from `src/routes/login.tsx` so login is generic.
-- App launches straight into Customer experience (`/` → splash → `/home`). No role UI visible anywhere.
+Turn TrimGo from a male-salon booking app into a 5-category beauty & service marketplace. This is a frontend/UX expansion on the existing mock-data architecture — no backend changes.
 
-### 2. Profile page → Owner Portal entry
-- Replace the existing "Own a salon?" link in `src/routes/profile.tsx` with a polished **Owner Portal** business card section, shown to all users.
-- Tapping it routes to `/owner-portal` (new gateway route) instead of jumping directly into `/owner`.
-- Add the profile menu items listed (My Bookings, Payment History, Saved Salons, Notifications, Settings, Help & Support, Owner Portal).
+## 1. Category model
 
-### 3. Owner Portal gateway (`src/routes/owner-portal.tsx`)
-Reads owner status from `localStorage` (`tg.ownerAccount`):
-- **Not registered** → "Become a Salon Owner" marketing card with benefits + buttons: **Register Salon**, **Learn More**.
-- **Registered but not logged in** → Owner Login screen (email, password, Remember Me, Forgot Password, Continue with Google). On success → `/owner`.
-- **Registered + logged in** → redirect to `/owner`.
+Add a shared `Category` type in `src/lib/mock-data.ts`:
 
-State stored client-side:
-- `tg.ownerAccount` = `{ email, registeredAt, ...profile }`
-- `tg.ownerSession` = boolean (set on successful "login")
+- `male` — Male Grooming
+- `female` — Female Beauty & Parlour
+- `home` — Home Services
+- `bridal` — Bridal Services
+- `wedding` — Wedding & Event Services
 
-### 4. Owner Registration Wizard (`src/routes/owner-register.tsx`)
-5-step wizard with progress indicator:
-1. Owner Info (name, email, phone, password)
-2. Salon Info (name, description, category)
-3. Media (logo, cover, gallery via existing `ImageDrop`)
-4. Location (address, map placeholder, business hours)
-5. Review & Submit → writes `tg.ownerAccount`, sets `tg.ownerSession`, navigates to `/owner`.
+Tag every existing salon with `category: "male"`. Seed ~12 new providers across the other 4 categories (each with name, hue, area, distance, price range, rating, sample services, portfolio images for bridal/wedding, travel charge + coverage area for home).
 
-### 5. Owner Dashboard enrichment
-Update `src/routes/owner.index.tsx` so the landing dashboard shows the full overview cards:
-Total Bookings, Today's Revenue, Monthly Revenue, Active Barbers, Customer Reviews, Pending Appointments, Earnings Overview chart, Job Applications. Use existing `owner-store` + `jobs-store` data; add a simple Recharts area chart for earnings.
+Persist user's chosen category in `localStorage` (`tg.category`) via a small `useCategory()` hook in `src/lib/category.tsx`.
 
-### 6. Keep existing owner sub-pages intact
-Settings / Services / Barbers / Bookings / Jobs already exist — just ensure sidebar links work and dashboard is the new overview.
+## 2. Category selection screen
 
-### Out of scope for this pass
-- Real backend auth (using local state, matches the rest of the app's mock data pattern).
-- Real-time chat, push notifications, PDF/Excel export, map integration — UI placeholders only where mentioned, no new infra.
+New route `src/routes/categories.tsx`:
 
-### Files
-- edit: `src/routes/__root.tsx`, `src/routes/login.tsx`, `src/routes/profile.tsx`, `src/routes/owner.index.tsx`
-- add: `src/routes/owner-portal.tsx`, `src/routes/owner-register.tsx`, `src/lib/owner-account.ts`
-- delete usage of: `src/components/role-toggle.tsx` (file kept but unused)
+- Title: "Choose Your Service Category"
+- 5 large gradient cards with icon, title, short description, sample services
+- Tap → save category → navigate to `/home`
+- Accessible later from a "Switch category" chip in the home header
+
+Flow update in `src/routes/index.tsx` (splash) and `src/routes/login.tsx`:
+- After splash/login → if no category in localStorage → `/categories`, else `/home`.
+
+## 3. Filtered Home
+
+Update `src/routes/home.tsx`:
+- Read active category; filter the salons/providers list accordingly
+- Show category name + "Switch" button in header
+- Category-specific quick filters:
+  - Home → show travel charge + coverage area badges
+  - Bridal → show "Portfolio" preview strip
+  - Wedding → show team/specialist badges
+  - Male/Female → existing price-range filters
+- Add gender, home-service-availability, and rating filters to the existing search/sort row
+
+## 4. Provider detail pages
+
+Reuse `src/routes/salons.$id.tsx`; extend rendering based on `category`:
+- Bridal/Wedding: portfolio gallery grid + "Package pricing" section
+- Home: travel charge, coverage area, available time slots
+- Male/Female: existing barber/service layout
+
+## 5. Booking variants
+
+Extend `src/routes/book.$barberId.tsx` (or add `book-home`, `book-bridal` thin wrappers) to support:
+- Instant vs Scheduled toggle
+- Home Visit address field (Home category)
+- Event date + venue (Bridal / Wedding)
+
+Payment screen (`src/routes/payment.tsx`): add bKash / Nagad / Rocket / Card / Cash-on-Service options (UI only, mock).
+
+## 6. Provider registration (owner side)
+
+Extend `src/routes/owner-register.tsx` step 2 ("Salon Info") to ask:
+- Business category (Male/Female/Home/Bridal/Wedding)
+- For Home: service area + travel charge
+- For Bridal/Wedding: portfolio uploads + package pricing
+
+Store on `OwnerAccount` in `src/lib/owner-account.ts`.
+
+## 7. i18n
+
+Add translation keys for all new strings to `src/lib/i18n.tsx` (English + Bengali).
+
+## Out of scope
+
+- Real payment gateways (bKash/Nagad/Rocket) — UI mock only
+- Real chat with providers — reuse existing mock chat
+- Maps for coverage area — show as text/radius badge
+- Calendar availability — show as static slot list
+
+## Files
+
+**Created**
+- `src/lib/category.tsx`
+- `src/routes/categories.tsx`
+
+**Edited**
+- `src/lib/mock-data.ts` (category field, new seed providers)
+- `src/lib/i18n.tsx`
+- `src/lib/owner-account.ts`
+- `src/routes/index.tsx`, `src/routes/login.tsx` (flow gating)
+- `src/routes/home.tsx` (category filter, switch chip)
+- `src/routes/salons.$id.tsx` (category-aware sections)
+- `src/routes/book.$barberId.tsx` (booking variants)
+- `src/routes/payment.tsx` (BD payment methods)
+- `src/routes/owner-register.tsx` (category + category-specific fields)
+- `src/components/mobile-shell.tsx` (optional: category chip in header)
