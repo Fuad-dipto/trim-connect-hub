@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { MapPin, Search, SlidersHorizontal, Star, Users, Bell, Map, Home as HomeIcon, Image as ImageIcon, X } from "lucide-react";
+import { MapPin, Search, SlidersHorizontal, Star, Users, Bell, Map, Home as HomeIcon, Image as ImageIcon, X, Moon, Sun } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
 import { salons, type Salon } from "@/lib/mock-data";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
 import { CATEGORY_META, setCategory, useCategory } from "@/lib/category";
 import { useNavigate } from "@tanstack/react-router";
+import { useTheme } from "@/lib/theme";
 import type { Category } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/home")({ component: Home });
@@ -31,6 +32,38 @@ const sortOptions = [
   { id: "pop", label: "Most popular" },
 ];
 
+function HeaderActions() {
+  const { theme, toggle: toggleTheme } = useTheme();
+  const { lang, setLang } = useT();
+  const dark = theme === "dark";
+  const nextLang = lang === "en" ? "bn" : "en";
+  const langLabel = lang === "en" ? "EN" : "BN";
+  return (
+    <div className="flex items-center gap-1.5">
+      <button aria-label="Notifications" className="relative h-8 w-8 rounded-full bg-white/15 backdrop-blur flex items-center justify-center hover:bg-white/25 transition">
+        <Bell className="h-4 w-4" />
+        <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-accent" />
+      </button>
+      <button
+        type="button"
+        onClick={toggleTheme}
+        aria-pressed={dark}
+        aria-label="Toggle theme"
+        className="h-8 w-8 rounded-full bg-white/15 backdrop-blur flex items-center justify-center hover:bg-white/25 transition"
+      >
+        {dark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+      </button>
+      <button
+        type="button"
+        onClick={() => setLang(nextLang)}
+        aria-label={`Switch language to ${nextLang.toUpperCase()}`}
+        className="h-8 w-8 rounded-full bg-white/15 backdrop-blur flex items-center justify-center hover:bg-white/25 transition text-[10px] font-bold tracking-wide"
+      >
+        {langLabel}
+      </button>
+    </div>
+  );
+}
 function Home() {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState("all");
@@ -89,10 +122,7 @@ function Home() {
             <p className="text-xs flex items-center gap-1 opacity-90"><MapPin className="h-3 w-3"/> {t("Current location")}</p>
             <p className="font-semibold text-sm">Gulshan 2, Dhaka</p>
           </div>
-          <button aria-label="Notifications" className="relative h-10 w-10 rounded-full bg-white/15 backdrop-blur flex items-center justify-center">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-accent" />
-          </button>
+          <HeaderActions />
         </div>
         <div className="mt-4 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
