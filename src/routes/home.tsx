@@ -1,15 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { MapPin, Search, SlidersHorizontal, Star, Users, Bell, Map, ArrowLeftRight, Home as HomeIcon, Image as ImageIcon } from "lucide-react";
-import { MobileShell, PageHeader } from "@/components/mobile-shell";
+import { MapPin, Search, SlidersHorizontal, Star, Users, Bell, Map, Home as HomeIcon, Image as ImageIcon, X } from "lucide-react";
+import { MobileShell } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
 import { salons, type Salon } from "@/lib/mock-data";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
-import { getCategoryMeta, useCategory } from "@/lib/category";
+import { CATEGORY_META, setCategory, useCategory } from "@/lib/category";
 import { useNavigate } from "@tanstack/react-router";
+import type { Category } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/home")({ component: Home });
 
@@ -33,6 +36,9 @@ function Home() {
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("nearest");
   const [view, setView] = useState<"list" | "map">("list");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [draftFilter, setDraftFilter] = useState("all");
+  const [draftSort, setDraftSort] = useState("nearest");
   const { t } = useT();
   const category = useCategory();
   const nav = useNavigate();
@@ -41,7 +47,7 @@ function Home() {
     if (!category) nav({ to: "/categories", replace: true });
   }, [category, nav]);
 
-  const meta = category ? getCategoryMeta(category) : null;
+  const activeMeta = category ? CATEGORY_META.find((c) => c.id === category) : null;
 
   const filtered = useMemo(() => {
     const f = quickFilters.find((x) => x.id === filter)!;
@@ -61,7 +67,19 @@ function Home() {
     return r;
   }, [q, filter, sort, category]);
 
-  const CatIcon = meta?.icon;
+  function openFilters() {
+    setDraftFilter(filter);
+    setDraftSort(sort);
+    setFilterOpen(true);
+  }
+  function applyFilters() {
+    setFilter(draftFilter);
+    setSort(draftSort);
+    setFilterOpen(false);
+  }
+
+  const activeFilterLabel = quickFilters.find((f) => f.id === filter)?.label ?? "All";
+  const activeSortLabel = sortOptions.find((o) => o.id === sort)?.label ?? "Nearest";
 
   return (
     <MobileShell>
@@ -76,21 +94,6 @@ function Home() {
             <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-accent" />
           </button>
         </div>
-        {meta && CatIcon && (
-          <button
-            onClick={() => nav({ to: "/categories" })}
-            className="mt-3 w-full rounded-2xl bg-white/15 backdrop-blur border border-white/20 px-3 py-2 flex items-center gap-3 text-left hover:bg-white/20 transition"
-          >
-            <div className="h-9 w-9 rounded-xl bg-white/20 flex items-center justify-center">
-              <CatIcon className="h-4 w-4" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] uppercase tracking-wide opacity-80">{t("Browsing")}</p>
-              <p className="text-sm font-semibold truncate">{t(meta.label)}</p>
-            </div>
-            <span className="text-[11px] flex items-center gap-1 opacity-90"><ArrowLeftRight className="h-3 w-3"/> {t("Switch")}</span>
-          </button>
-        )}
         <div className="mt-4 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -103,39 +106,58 @@ function Home() {
 
       <div className="px-4 mt-5">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-sm">{t("Browse by price")}</h2>
+          <h2 className="font-semibold text-sm">{t("Who are we serving?")}</h2>
           <button onClick={() => setView(view === "list" ? "map" : "list")} className="text-xs flex items-center gap-1 text-primary font-medium">
             <Map className="h-3.5 w-3.5"/> {view === "list" ? t("Map view") : t("List view")}
           </button>
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-          {quickFilters.map((f) => (
-            <button key={f.id} onClick={() => setFilter(f.id)}
-              className={cn("shrink-0 px-3 py-2 rounded-xl border text-xs font-medium text-left transition",
-                filter === f.id ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/30" : "bg-card border-border hover:border-primary/40"
-              )}>
-              <div>{t(f.label)}</div>
-              {f.sub && <div className="opacity-70 text-[10px] mt-0.5">{f.sub}</div>}
-            </button>
-          ))}
+        <div className="grid grid-cols-3 gap-2">
+          {CATEGORY_META.map((c) => {
+            const Icon = c.icon;
+            const active = category === c.id;
+            return (
+              <button
+                key={c.id}
+                onClick={() => setCategory(c.id as Category)}
+                className={cn(
+                  "relative aspect-square rounded-2xl overflow-hidden border text-left transition-all",
+                  active ? "border-primary shadow-lg shadow-primary/30 -translate-y-0.5" : "border-border hover:border-primary/40",
+                )}
+              >
+                <div className={cn("absolute inset-0 bg-gradient-to-br", c.gradient, active ? "opacity-100" : "opacity-90")} />
+                <div className="relative h-full w-full p-2.5 flex flex-col justify-between text-white">
+                  <div className="h-8 w-8 rounded-xl bg-white/25 backdrop-blur flex items-center justify-center">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold leading-tight">{t(c.label)}</p>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
 
-        <div className="mt-4 flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-          <div className="shrink-0 flex items-center gap-1 text-xs text-muted-foreground"><SlidersHorizontal className="h-3.5 w-3.5"/>{t("Sort")}</div>
-          {sortOptions.map((o) => (
-            <button key={o.id} onClick={() => setSort(o.id)}
-              className={cn("shrink-0 px-3 py-1 rounded-full text-xs border transition",
-                sort === o.id ? "bg-foreground text-background border-foreground" : "bg-card border-border text-muted-foreground")}>
-              {t(o.label)}
-            </button>
-          ))}
+        <div className="mt-4 flex items-center gap-2">
+          <button
+            onClick={openFilters}
+            className="flex-1 flex items-center justify-between gap-2 h-11 px-4 rounded-xl bg-card border border-border hover:border-primary/40 transition text-left"
+          >
+            <span className="flex items-center gap-2 text-sm font-medium">
+              <SlidersHorizontal className="h-4 w-4 text-primary" />
+              {t("Filters")}
+            </span>
+            <span className="text-[11px] text-muted-foreground truncate">
+              {t(activeFilterLabel)} · {t(activeSortLabel)}
+            </span>
+          </button>
         </div>
       </div>
 
       {view === "map" ? <MapView salons={filtered} t={t} /> : (
         <section className="px-4 mt-5 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold">{meta ? t(meta.label) : t("Nearby salons")}</h2>
+            <h2 className="font-semibold">{activeMeta ? t(activeMeta.label) : t("Nearby salons")}</h2>
             <span className="text-xs text-muted-foreground">{filtered.length} {t("found")}</span>
           </div>
           {filtered.map((s) => <SalonCard key={s.id} salon={s} t={t} />)}
@@ -146,6 +168,80 @@ function Home() {
           )}
         </section>
       )}
+
+      <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
+        <SheetContent
+          side="top"
+          className="rounded-b-3xl border-b max-h-[85vh] overflow-y-auto p-0 [&>button]:hidden"
+        >
+          <div className="px-5 pt-5 pb-4 flex items-center justify-between border-b border-border">
+            <SheetTitle className="text-base">{t("Filters")}</SheetTitle>
+            <button
+              onClick={() => setFilterOpen(false)}
+              aria-label="Close"
+              className="h-9 w-9 rounded-full bg-secondary hover:bg-secondary/80 flex items-center justify-center transition"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="px-5 py-5 space-y-6">
+            <div>
+              <h3 className="text-sm font-semibold mb-3">{t("Price range")}</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {quickFilters.map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setDraftFilter(f.id)}
+                    className={cn(
+                      "px-3 py-3 rounded-xl border text-left transition",
+                      draftFilter === f.id
+                        ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/30"
+                        : "bg-card border-border hover:border-primary/40",
+                    )}
+                  >
+                    <div className="text-sm font-medium">{t(f.label)}</div>
+                    {f.sub && <div className="opacity-70 text-[11px] mt-0.5">{f.sub}</div>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold mb-3">{t("Sort by")}</h3>
+              <div className="flex flex-wrap gap-2">
+                {sortOptions.map((o) => (
+                  <button
+                    key={o.id}
+                    onClick={() => setDraftSort(o.id)}
+                    className={cn(
+                      "px-3 py-2 rounded-full text-xs border transition",
+                      draftSort === o.id
+                        ? "bg-foreground text-background border-foreground"
+                        : "bg-card border-border text-muted-foreground hover:border-primary/40",
+                    )}
+                  >
+                    {t(o.label)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="sticky bottom-0 bg-background border-t border-border px-5 py-4 flex gap-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => { setDraftFilter("all"); setDraftSort("nearest"); }}
+            >
+              {t("Reset")}
+            </Button>
+            <Button className="flex-1" onClick={applyFilters}>
+              {t("Apply filters")}
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
     </MobileShell>
   );
 }
