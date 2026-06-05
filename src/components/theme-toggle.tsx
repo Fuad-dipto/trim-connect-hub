@@ -8,15 +8,15 @@ export function ThemeToggle() {
   const { t } = useT();
   const dark = theme === "dark";
   return (
-    <div className="fixed top-2 right-[7.5rem] z-[60] pointer-events-none">
+    <div className="fixed top-2 right-14 z-[60] pointer-events-none">
       <button
         type="button"
         onClick={toggle}
         aria-pressed={dark}
         aria-label={t("Toggle theme")}
-        className="pointer-events-auto h-7 w-7 rounded-full border border-border bg-background/85 backdrop-blur flex items-center justify-center shadow-lg shadow-black/5 text-foreground hover:bg-secondary transition"
+        className="pointer-events-auto h-10 w-10 rounded-full border border-border bg-background/85 backdrop-blur flex items-center justify-center shadow-lg shadow-black/5 text-foreground hover:bg-secondary transition"
       >
-        {dark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+        {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
       </button>
     </div>
   );
