@@ -8,7 +8,7 @@ export function ThemeToggle() {
   const { t } = useT();
   const dark = theme === "dark";
   return (
-    <div className="fixed top-2 right-[3.75rem] z-[60] pointer-events-none">
+    <div className="fixed top-2 right-14 z-[60] pointer-events-none">
       <button
         type="button"
         onClick={toggle}
