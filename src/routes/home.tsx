@@ -64,7 +64,7 @@ function HeaderActions() {
     </div>
   );
 }
-
+function Home() {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("nearest");
