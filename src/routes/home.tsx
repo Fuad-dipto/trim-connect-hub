@@ -32,7 +32,39 @@ const sortOptions = [
   { id: "pop", label: "Most popular" },
 ];
 
-function Home() {
+function HeaderActions() {
+  const { theme, toggle: toggleTheme } = useTheme();
+  const { lang, setLang } = useT();
+  const dark = theme === "dark";
+  const nextLang = lang === "en" ? "bn" : "en";
+  const langLabel = lang === "en" ? "EN" : "BN";
+  return (
+    <div className="flex items-center gap-1.5">
+      <button aria-label="Notifications" className="relative h-8 w-8 rounded-full bg-white/15 backdrop-blur flex items-center justify-center hover:bg-white/25 transition">
+        <Bell className="h-4 w-4" />
+        <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-accent" />
+      </button>
+      <button
+        type="button"
+        onClick={toggleTheme}
+        aria-pressed={dark}
+        aria-label="Toggle theme"
+        className="h-8 w-8 rounded-full bg-white/15 backdrop-blur flex items-center justify-center hover:bg-white/25 transition"
+      >
+        {dark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+      </button>
+      <button
+        type="button"
+        onClick={() => setLang(nextLang)}
+        aria-label={`Switch language to ${nextLang.toUpperCase()}`}
+        className="h-8 w-8 rounded-full bg-white/15 backdrop-blur flex items-center justify-center hover:bg-white/25 transition text-[10px] font-bold tracking-wide"
+      >
+        {langLabel}
+      </button>
+    </div>
+  );
+}
+
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("nearest");
