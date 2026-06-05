@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { MapPin, Search, SlidersHorizontal, Star, Users, Bell, Map, Home as HomeIcon, Image as ImageIcon, X } from "lucide-react";
+import { MapPin, Search, SlidersHorizontal, Star, Users, Bell, Map, Home as HomeIcon, Image as ImageIcon, X, Moon, Sun } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
 import { salons, type Salon } from "@/lib/mock-data";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
 import { CATEGORY_META, setCategory, useCategory } from "@/lib/category";
 import { useNavigate } from "@tanstack/react-router";
+import { useTheme } from "@/lib/theme";
 import type { Category } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/home")({ component: Home });
@@ -89,10 +90,7 @@ function Home() {
             <p className="text-xs flex items-center gap-1 opacity-90"><MapPin className="h-3 w-3"/> {t("Current location")}</p>
             <p className="font-semibold text-sm">Gulshan 2, Dhaka</p>
           </div>
-          <button aria-label="Notifications" className="relative h-10 w-10 rounded-full bg-white/15 backdrop-blur flex items-center justify-center">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-accent" />
-          </button>
+          <HeaderActions />
         </div>
         <div className="mt-4 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
