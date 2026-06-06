@@ -71,7 +71,7 @@ const subscribe = (l: () => void) => { listeners.add(l); return () => listeners.
 const getSnap = () => current;
 
 export function useCategory(): Category | null {
-  return useSyncExternalStore(subscribe, getSnap, getSnap);
+  return useSyncExternalStore(subscribe, getSnap, () => null);
 }
 
 export function setCategory(c: Category | null) {
