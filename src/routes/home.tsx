@@ -45,13 +45,14 @@ const DHAKA_AREAS = [
   "Old Dhaka",
 ];
 
-const CATEGORY_IMAGES: Record<string, string> = {
-  male: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&auto=format&fit=crop&q=70",
-  female: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&auto=format&fit=crop&q=70",
-  home: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&auto=format&fit=crop&q=70",
-  bridal: "https://images.unsplash.com/photo-1595407753234-0882f1e77954?w=400&auto=format&fit=crop&q=70",
-  wedding: "https://images.unsplash.com/photo-1519741497674-611481863552?w=400&auto=format&fit=crop&q=70",
-};
+const INSTITUTIONS = [
+  { id: "i1", name: "Gents Care Studio", segment: "Male Grooming", category: "male" as Category, image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=200&auto=format&fit=crop&q=60" },
+  { id: "i2", name: "Lavender Lounge", segment: "Female Beauty", category: "female" as Category, image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=200&auto=format&fit=crop&q=60" },
+  { id: "i3", name: "HomeGlow", segment: "Home Service", category: "home" as Category, image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&auto=format&fit=crop&q=60" },
+  { id: "i4", name: "Bridal Bliss", segment: "Bridal", category: "bridal" as Category, image: "https://images.unsplash.com/photo-1595407753234-0882f1e77954?w=200&auto=format&fit=crop&q=60" },
+  { id: "i5", name: "Wedding Lens BD", segment: "Wedding", category: "wedding" as Category, image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=200&auto=format&fit=crop&q=60" },
+  { id: "i6", name: "Family Care Hub", segment: "Family", category: "home" as Category, image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&auto=format&fit=crop&q=60" },
+];
 
 function HeaderActions() {
   const { theme, toggle: toggleTheme } = useTheme();
@@ -194,42 +195,29 @@ function Home() {
             <Map className="h-3.5 w-3.5"/> {view === "list" ? t("Map view") : t("List view")}
           </button>
         </div>
-        <div className="grid grid-cols-3 gap-2">
-          {CATEGORY_META.map((c) => {
-            const Icon = c.icon;
-            const active = category === c.id;
-            const img = CATEGORY_IMAGES[c.id];
+        <div className="flex gap-2 overflow-x-auto pb-1.5 -mx-4 px-4 [&::-webkit-scrollbar]:hidden">
+          {INSTITUTIONS.map((inst) => {
+            const active = category === inst.category;
             return (
               <button
-                key={c.id}
-                onClick={() => setCategory(c.id as Category)}
+                key={inst.id}
+                onClick={() => setCategory(inst.category)}
                 className={cn(
-                  "group relative aspect-[4/5] rounded-2xl overflow-hidden border text-left transition-all duration-300",
-                  "hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20",
-                  active ? "border-primary shadow-lg shadow-primary/30 -translate-y-0.5" : "border-border hover:border-primary/50",
+                  "group flex-shrink-0 w-[10rem] h-[3.6rem] rounded-xl border overflow-hidden flex items-center text-left transition-all duration-300",
+                  active ? "border-primary shadow-md shadow-primary/20 -translate-y-0.5" : "border-border hover:border-primary/50 hover:-translate-y-0.5 hover:shadow-md",
                 )}
               >
-                {img && (
+                <div className="h-full w-12 shrink-0 overflow-hidden">
                   <img
-                    src={img}
-                    alt={c.label}
+                    src={inst.image}
+                    alt={inst.name}
                     loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
-                )}
-                <div className={cn(
-                  "absolute inset-0 bg-gradient-to-br mix-blend-multiply transition-opacity duration-300",
-                  c.gradient,
-                  active ? "opacity-80" : "opacity-70 group-hover:opacity-60",
-                )} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                <div className="relative h-full w-full p-2 flex flex-col justify-between text-white">
-                  <div className="h-7 w-7 rounded-lg bg-white/25 backdrop-blur flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                    <Icon className="h-3.5 w-3.5" />
-                  </div>
-                  <div>
-                    <p className="text-[10.5px] font-semibold leading-tight drop-shadow">{t(c.label)}</p>
-                  </div>
+                </div>
+                <div className="flex-1 min-w-0 px-2 py-1 flex flex-col justify-center">
+                  <p className="text-[11px] font-semibold leading-tight truncate">{inst.name}</p>
+                  <p className="text-[9px] text-muted-foreground mt-0.5 truncate">{inst.segment}</p>
                 </div>
               </button>
             );
