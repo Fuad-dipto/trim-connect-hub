@@ -11,10 +11,8 @@ import {
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { LanguageProvider } from "@/lib/i18n";
-import { LanguageToggle } from "@/components/language-toggle";
 import { RoleProvider } from "@/lib/role";
 import { ThemeProvider } from "@/lib/theme";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 function NotFoundComponent() {
   return (
@@ -122,8 +120,6 @@ function RootComponent() {
       <ThemeProvider>
         <LanguageProvider>
           <RoleProvider>
-            <LanguageToggle />
-            <ThemeToggle />
             <Outlet />
             <Toaster richColors position="top-center" />
           </RoleProvider>
