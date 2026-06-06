@@ -45,13 +45,14 @@ const DHAKA_AREAS = [
   "Old Dhaka",
 ];
 
-const CATEGORY_IMAGES: Record<string, string> = {
-  male: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&auto=format&fit=crop&q=70",
-  female: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&auto=format&fit=crop&q=70",
-  home: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&auto=format&fit=crop&q=70",
-  bridal: "https://images.unsplash.com/photo-1595407753234-0882f1e77954?w=400&auto=format&fit=crop&q=70",
-  wedding: "https://images.unsplash.com/photo-1519741497674-611481863552?w=400&auto=format&fit=crop&q=70",
-};
+const INSTITUTIONS = [
+  { id: "i1", name: "Gents Care Studio", segment: "Male Grooming", category: "male" as Category, image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=200&auto=format&fit=crop&q=60" },
+  { id: "i2", name: "Lavender Lounge", segment: "Female Beauty", category: "female" as Category, image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=200&auto=format&fit=crop&q=60" },
+  { id: "i3", name: "HomeGlow", segment: "Home Service", category: "home" as Category, image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&auto=format&fit=crop&q=60" },
+  { id: "i4", name: "Bridal Bliss", segment: "Bridal", category: "bridal" as Category, image: "https://images.unsplash.com/photo-1595407753234-0882f1e77954?w=200&auto=format&fit=crop&q=60" },
+  { id: "i5", name: "Wedding Lens BD", segment: "Wedding", category: "wedding" as Category, image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=200&auto=format&fit=crop&q=60" },
+  { id: "i6", name: "Family Care Hub", segment: "Family", category: "home" as Category, image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&auto=format&fit=crop&q=60" },
+];
 
 function HeaderActions() {
   const { theme, toggle: toggleTheme } = useTheme();
