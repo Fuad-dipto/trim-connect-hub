@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { MapPin, Search, SlidersHorizontal, Star, Users, Bell, Map, Home as HomeIcon, Image as ImageIcon, X, Moon, Sun } from "lucide-react";
+import { MapPin, Search, SlidersHorizontal, Star, Users, Bell, Map, Home as HomeIcon, Image as ImageIcon, X, Moon, Sun, ChevronDown, Locate, Check } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
 import { Avatar } from "@/components/brand";
 import { salons, type Salon } from "@/lib/mock-data";
@@ -31,6 +31,27 @@ const sortOptions = [
   { id: "high", label: "Highest price" },
   { id: "pop", label: "Most popular" },
 ];
+
+const DHAKA_AREAS = [
+  "Gulshan 1, Dhaka",
+  "Gulshan 2, Dhaka",
+  "Banani, Dhaka",
+  "Dhanmondi, Dhaka",
+  "Mirpur, Dhaka",
+  "Uttara, Dhaka",
+  "Bashundhara R/A, Dhaka",
+  "Mohammadpur, Dhaka",
+  "Motijheel, Dhaka",
+  "Old Dhaka",
+];
+
+const CATEGORY_IMAGES: Record<string, string> = {
+  male: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&auto=format&fit=crop&q=70",
+  female: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&auto=format&fit=crop&q=70",
+  home: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&auto=format&fit=crop&q=70",
+  bridal: "https://images.unsplash.com/photo-1595407753234-0882f1e77954?w=400&auto=format&fit=crop&q=70",
+  wedding: "https://images.unsplash.com/photo-1519741497674-611481863552?w=400&auto=format&fit=crop&q=70",
+};
 
 function HeaderActions() {
   const { theme, toggle: toggleTheme } = useTheme();
@@ -72,6 +93,9 @@ function Home() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [draftFilter, setDraftFilter] = useState("all");
   const [draftSort, setDraftSort] = useState("nearest");
+  const [location, setLocation] = useState("Gulshan 2, Dhaka");
+  const [locationOpen, setLocationOpen] = useState(false);
+  const [locating, setLocating] = useState(false);
   const { t } = useT();
   const category = useCategory();
   const nav = useNavigate();
@@ -114,14 +138,43 @@ function Home() {
   const activeFilterLabel = quickFilters.find((f) => f.id === filter)?.label ?? "All";
   const activeSortLabel = sortOptions.find((o) => o.id === sort)?.label ?? "Nearest";
 
+  function useCurrentLocation() {
+    setLocating(true);
+    if (typeof navigator !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          setLocation("Current location · Dhaka");
+          setLocating(false);
+          setLocationOpen(false);
+        },
+        () => {
+          setLocation("Current location · Dhaka");
+          setLocating(false);
+          setLocationOpen(false);
+        },
+        { timeout: 5000 },
+      );
+    } else {
+      setLocation("Current location · Dhaka");
+      setLocating(false);
+      setLocationOpen(false);
+    }
+  }
+
   return (
     <MobileShell>
       <header className="px-4 pt-5 pb-3 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-b-3xl shadow-lg shadow-primary/20">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs flex items-center gap-1 opacity-90"><MapPin className="h-3 w-3"/> {t("Current location")}</p>
-            <p className="font-semibold text-sm">Gulshan 2, Dhaka</p>
-          </div>
+          <button
+            type="button"
+            onClick={() => setLocationOpen(true)}
+            className="text-left rounded-xl px-2 -mx-2 py-1 hover:bg-white/10 active:bg-white/15 transition"
+          >
+            <p className="text-[11px] flex items-center gap-1 opacity-90"><MapPin className="h-3 w-3"/> {t("Current location")}</p>
+            <p className="font-semibold text-sm flex items-center gap-1">
+              {location} <ChevronDown className="h-3.5 w-3.5 opacity-80" />
+            </p>
+          </button>
           <HeaderActions />
         </div>
         <div className="mt-4 relative">
@@ -135,7 +188,7 @@ function Home() {
       </header>
 
       <div className="px-4 mt-5">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-2.5">
           <h2 className="font-semibold text-sm">{t("Who are we serving?")}</h2>
           <button onClick={() => setView(view === "list" ? "map" : "list")} className="text-xs flex items-center gap-1 text-primary font-medium">
             <Map className="h-3.5 w-3.5"/> {view === "list" ? t("Map view") : t("List view")}
@@ -145,22 +198,37 @@ function Home() {
           {CATEGORY_META.map((c) => {
             const Icon = c.icon;
             const active = category === c.id;
+            const img = CATEGORY_IMAGES[c.id];
             return (
               <button
                 key={c.id}
                 onClick={() => setCategory(c.id as Category)}
                 className={cn(
-                  "relative aspect-square rounded-2xl overflow-hidden border text-left transition-all",
-                  active ? "border-primary shadow-lg shadow-primary/30 -translate-y-0.5" : "border-border hover:border-primary/40",
+                  "group relative aspect-[4/5] rounded-2xl overflow-hidden border text-left transition-all duration-300",
+                  "hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20",
+                  active ? "border-primary shadow-lg shadow-primary/30 -translate-y-0.5" : "border-border hover:border-primary/50",
                 )}
               >
-                <div className={cn("absolute inset-0 bg-gradient-to-br", c.gradient, active ? "opacity-100" : "opacity-90")} />
-                <div className="relative h-full w-full p-2.5 flex flex-col justify-between text-white">
-                  <div className="h-8 w-8 rounded-xl bg-white/25 backdrop-blur flex items-center justify-center">
-                    <Icon className="h-4 w-4" />
+                {img && (
+                  <img
+                    src={img}
+                    alt={c.label}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                )}
+                <div className={cn(
+                  "absolute inset-0 bg-gradient-to-br mix-blend-multiply transition-opacity duration-300",
+                  c.gradient,
+                  active ? "opacity-80" : "opacity-70 group-hover:opacity-60",
+                )} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                <div className="relative h-full w-full p-2 flex flex-col justify-between text-white">
+                  <div className="h-7 w-7 rounded-lg bg-white/25 backdrop-blur flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                    <Icon className="h-3.5 w-3.5" />
                   </div>
                   <div>
-                    <p className="text-[11px] font-semibold leading-tight">{t(c.label)}</p>
+                    <p className="text-[10.5px] font-semibold leading-tight drop-shadow">{t(c.label)}</p>
                   </div>
                 </div>
               </button>
@@ -168,18 +236,14 @@ function Home() {
           })}
         </div>
 
-        <div className="mt-4 flex items-center gap-2">
+        <div className="mt-3 flex items-center justify-end">
           <button
             onClick={openFilters}
-            className="flex-1 flex items-center justify-between gap-2 h-11 px-4 rounded-xl bg-card border border-border hover:border-primary/40 transition text-left"
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-card border border-border hover:border-primary/50 hover:text-primary transition text-xs font-medium"
           >
-            <span className="flex items-center gap-2 text-sm font-medium">
-              <SlidersHorizontal className="h-4 w-4 text-primary" />
-              {t("Filters")}
-            </span>
-            <span className="text-[11px] text-muted-foreground truncate">
-              {t(activeFilterLabel)} · {t(activeSortLabel)}
-            </span>
+            <SlidersHorizontal className="h-3.5 w-3.5" />
+            {t("Filters")}
+            <span className="text-[10px] text-muted-foreground ml-0.5">· {t(activeFilterLabel)} · {t(activeSortLabel)}</span>
           </button>
         </div>
       </div>
@@ -201,8 +265,8 @@ function Home() {
 
       <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
         <SheetContent
-          side="top"
-          className="rounded-b-3xl border-b max-h-[85vh] overflow-y-auto p-0 [&>button]:hidden"
+          side="bottom"
+          className="rounded-t-3xl border-t max-h-[85vh] overflow-y-auto p-0 [&>button]:hidden"
         >
           <div className="px-5 pt-5 pb-4 flex items-center justify-between border-b border-border">
             <SheetTitle className="text-base">{t("Filters")}</SheetTitle>
@@ -269,6 +333,65 @@ function Home() {
             <Button className="flex-1" onClick={applyFilters}>
               {t("Apply filters")}
             </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <Sheet open={locationOpen} onOpenChange={setLocationOpen}>
+        <SheetContent
+          side="bottom"
+          className="rounded-t-3xl border-t max-h-[80vh] overflow-y-auto p-0 [&>button]:hidden"
+        >
+          <div className="px-5 pt-5 pb-4 flex items-center justify-between border-b border-border">
+            <SheetTitle className="text-base">{t("Choose location")}</SheetTitle>
+            <button
+              onClick={() => setLocationOpen(false)}
+              aria-label="Close"
+              className="h-9 w-9 rounded-full bg-secondary hover:bg-secondary/80 flex items-center justify-center transition"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="px-5 py-5 space-y-4">
+            <button
+              type="button"
+              onClick={useCurrentLocation}
+              disabled={locating}
+              className="w-full flex items-center gap-3 p-3 rounded-xl border border-primary/40 bg-primary/5 hover:bg-primary/10 transition text-left disabled:opacity-60"
+            >
+              <div className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                <Locate className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">{locating ? t("Locating…") : t("Use current location")}</p>
+                <p className="text-[11px] text-muted-foreground">{t("We'll detect your position via GPS")}</p>
+              </div>
+            </button>
+
+            <div>
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t("Select manually")}</h3>
+              <div className="space-y-1">
+                {DHAKA_AREAS.map((a) => {
+                  const selected = a === location;
+                  return (
+                    <button
+                      key={a}
+                      type="button"
+                      onClick={() => { setLocation(a); setLocationOpen(false); }}
+                      className={cn(
+                        "w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm transition text-left",
+                        selected ? "bg-primary/10 text-primary font-medium" : "hover:bg-secondary",
+                      )}
+                    >
+                      <span className="flex items-center gap-2">
+                        <MapPin className="h-3.5 w-3.5 opacity-70" /> {a}
+                      </span>
+                      {selected && <Check className="h-4 w-4" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </SheetContent>
       </Sheet>
